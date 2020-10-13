@@ -1,0 +1,10 @@
+{
+  "filePathList": ["excel2lang/lang*.xlsx"],
+  "output": "./dist/lang ",
+  "langNameRow": 1,
+  "idCol": 0,
+  "sheetIdx":0,
+  "fileType": "ts",
+  "templateExcel": "excel2lang/lang_0_template.xlsx",
+  "missingValue": "[TODO]"
+}

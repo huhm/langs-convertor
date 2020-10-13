@@ -1,0 +1,17 @@
+{
+  "name": "lang2excel-example",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "lang2excel": "node lang2excel/index",
+    "excel2lang": "node ../bin/lang-cvt -f excel2lang/lang_0*.xlsx excel2lang/lang_1*.xlsx -o ./dist/lang  --fileType ts --templateExcel excel2lang/lang_0_template.xlsx"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "langs-convertor": "^2.0.0"
+  }
+}

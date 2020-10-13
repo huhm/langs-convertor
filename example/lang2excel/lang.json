@@ -1,0 +1,10 @@
+{
+  "Common": {
+    "Home": "Home",
+    "FAQ": "FAQ",
+    "Policy": "Privacy Policy"
+  },
+  "Home": {
+    "title": "I'm home title"
+  }
+}
