@@ -1,7 +1,7 @@
 {
   "name": "langs-tool",
-  "version": "2.0.1",
-  "description": "",
+  "version": "2.0.2",
+  "description": "excel convert to json/xml/ts or json convert to excel",
   "main": "bin/index.js",
   "types": "bin/index.d.ts",
   "scripts": {

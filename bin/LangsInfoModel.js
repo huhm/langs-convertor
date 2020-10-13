@@ -67,6 +67,8 @@ class LangsInfoModel {
                         moduleObj: moduleV,
                         moduleName,
                         langName,
+                        // fieldsList:langVal.fieldsList,
+                        langModel: langVal
                     });
                 }
                 else {
@@ -80,6 +82,7 @@ class LangsInfoModel {
                     moduleObj: rootData,
                     //   moduleName: null,
                     langName,
+                    langModel: langVal
                 });
             }
         });

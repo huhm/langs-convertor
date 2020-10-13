@@ -50,12 +50,13 @@ export declare function convertExcelToFile(filePathList: string[], options?: {
     sheetIdx?: number;
     /**
      * json： 每个语言一个文件
+     * xml: 已有模板 ，每个语言一个文件
      * json-module:已有模板，每个语言每个模块一个文件
      * ts: 已有模板 ，每个语言每个模块一个文件
      * custom: 自定义有模板，每个语言一个文件
      * custom-module: 自定义模板，每个语言一个文件
      */
-    fileType: 'json' | 'ts' | 'json-module' | 'custom' | 'custom-module';
+    fileType: 'json' | 'xml' | 'ts' | 'json-module' | 'custom' | 'custom-module';
     /**
      * fileType为custom时有效
      * 自定义的模板路径，生成的文件ext为模板的后缀

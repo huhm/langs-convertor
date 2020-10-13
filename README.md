@@ -1,14 +1,32 @@
 # langs-tool
 [![npm version](https://badge.fury.io/js/langs-tool.svg)](https://badge.fury.io/js/langs-tool)
 
+## Features
++ excel转json/typescript/自定义模板
+  + 支持一行有多个字段KEY()
+  + 支持冗余字段删除(templateExcel)
+  + 支持未翻译字段占位(missingMode=placeholder)
+  + 支持多个文件批量转化
+  + 支持字段覆盖
+  + 可自动查找ID列和语言行(``[[ID]]``)
+  + 支持一个语言一个文件 或 一个语言一个模块(ID第一层KEY)一个文件
++ 多语言json转excel
+
 ## 命令行方式
 1. 安装 ``npm i langs-tool``
 2. 使用
 ``` bash
 # 查看帮助文档
 npx lang-cvt -h
+
 # 转化xlsx 为json文件
-npx lang-cvt -f ./first_lang*.xlsx ./sencond_lang*.xlsx -o ./dist/lang --langNameRow 1 --idCol 0 --templateExcel ./lang_0_template.xlsx
+npx lang-cvt -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist  --fileType xml
+
+# 转xlsx 为xml文件 fileType=xml
+-f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --fileType xml
+
+# 转xlsx 为ts文件 fileType=ts
+-f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --templateExcel ./dist/template.xlsx --fileType ts --missingMode placeholder
 ```
 
 
@@ -24,8 +42,8 @@ npx lang-cvt -f ./first_lang*.xlsx ./sencond_lang*.xlsx -o ./dist/lang --langNam
     + 从ID列往后一列，同时非空的单元格
     + 有效语言简称不能包含'[' 或 ']'
   + 语言行中所有**有效语言**，都将翻译为一种语言
-+ ID列和语言行交叉的Cell为定位锚点
-  + 可手动指定 anchorCellPos
++ ID列和语言行交叉的Cell为定位锚点(anchorCellPos)
+  + 可手动指定 
   + 也可自动查找表格单元格内容为``[[ID]]``的单元格
 + 有效数据，同时满足以下条件
   + 有效语言所在列

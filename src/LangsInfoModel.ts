@@ -66,7 +66,9 @@ export default class LangsInfoModel {
     func: (data: {
       moduleObj: ILangObj
       moduleName?: string
-      langName: string
+      langName: string,
+      // fieldsList: LangInfoItemModel[],
+      langModel:LangInfoModel
     }) => void
   ) {
     this.forEachLang((langVal, langName) => {
@@ -84,6 +86,8 @@ export default class LangsInfoModel {
             moduleObj: moduleV,
             moduleName,
             langName,
+            // fieldsList:langVal.fieldsList,
+            langModel:langVal
           })
         } else {
           // 根上的数据
@@ -96,6 +100,7 @@ export default class LangsInfoModel {
           moduleObj: rootData,
           //   moduleName: null,
           langName,
+          langModel:langVal
         })
       }
     })

@@ -42,7 +42,7 @@ program
  
   .option(
     '-t, --fileType <fileType>',
-    `default template fileType json|ts|json-module|custom|custom-module`,
+    `default template fileType json|xml|ts|json-module|custom|custom-module`,
     'json'
   )
   .option(

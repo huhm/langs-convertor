@@ -41,7 +41,7 @@ commander_1.default
     .option('-o, --output <outputPath>', `output directory`, './dist.lang/')
     .option('--sheetIdx <sheetIdx>', `sheet number, start at 0`, '0')
     .option('--anchorCellPos <anchorCellPos>', `the anchor Cell,[row,col]`)
-    .option('-t, --fileType <fileType>', `default template fileType json|ts|json-module|custom|custom-module`, 'json')
+    .option('-t, --fileType <fileType>', `default template fileType json|xml|ts|json-module|custom|custom-module`, 'json')
     .option('--customTemplatePath <customTemplatePath>', `customTemplatePath only used in fileType (custom|custom-module)`)
     .option('--missingMode <missingMode>', 'none or placeholder', 'none')
     .option('--missingValue <missingValue>', 'if missingValue is declared, the missingMode is placeholder,only used in the customTemplatePath', '[TODO:TRANS]')

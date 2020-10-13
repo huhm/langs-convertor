@@ -21,6 +21,7 @@ export default class LangsInfoModel {
         moduleObj: ILangObj;
         moduleName?: string;
         langName: string;
+        langModel: LangInfoModel;
     }) => void): void;
     normalizeByTemplate(templateFieldsSet: Set<string>, options: {
         /**

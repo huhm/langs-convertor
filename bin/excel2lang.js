@@ -20,6 +20,9 @@ const utils_1 = require("./utils");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const LangsInfoModel_1 = __importDefault(require("./LangsInfoModel"));
+const typescript_1 = __importDefault(require("./template/typescript"));
+const json_1 = __importDefault(require("./template/json"));
+const xml_1 = __importDefault(require("./template/xml"));
 const doT = require('dot');
 doT.templateSettings.strip = false;
 // import fs from 'fs'
@@ -156,18 +159,6 @@ function updateLangsInfoModelFromSheetData(sheetData, sheetResult, options) {
     return result;
 }
 exports.updateLangsInfoModelFromSheetData = updateLangsInfoModelFromSheetData;
-//#endregion
-//#region 文件生成
-const JSON_TEMPLATE = `
-{{=it.moduleJsonString}}
-`;
-const TS_TEMPLATE_TYPE_NAME = "LANGINFO_{{=(it.moduleName||'ROOT').toUpperCase()}}";
-const TS_TEMPLATE_MODULE_NAME = "LangInfo{{!it.moduleName}}";
-const TS_TEMPLATE = `{{? it.langName.toLowerCase()!=='en'}}import { ${TS_TEMPLATE_MODULE_NAME} } from './en'
-{{?}}const ${TS_TEMPLATE_TYPE_NAME}{{? it.langName.toLowerCase()!=='en'}}:${TS_TEMPLATE_MODULE_NAME}{{?}} = {{=it.moduleJsonString}}
-{{?it.langName.toLowerCase()==='en'}}export type ${TS_TEMPLATE_MODULE_NAME} = typeof ${TS_TEMPLATE_TYPE_NAME}{{?}}
-export default ${TS_TEMPLATE_TYPE_NAME}
-`;
 /**
  * 一个语言包一个模块一个文件
  * @param langsInfoModel
@@ -186,7 +177,7 @@ function _convertSheetToModuleFiles(langsInfoModel, moduleContentConvertor, opti
     if (!fs_1.default.existsSync(pathStr)) {
         fs_1.default.mkdirSync(pathStr);
     }
-    langsInfoModel.forEachModule(({ moduleObj, moduleName, langName }) => {
+    langsInfoModel.forEachModule(({ moduleObj, moduleName, langName, langModel }) => {
         const filePath = getFileName({
             langName,
             moduleName: moduleName || undefined,
@@ -229,6 +220,7 @@ function _convertSheetToFiles(langsInfoModel, contentTemplate, templateExt, opti
             langName,
             destDirPath: pathStr,
             moduleJsonString: JSON.stringify(moduleObj, null, 2),
+            fieldsList: model.fieldsList,
             moduleObj: moduleObj
         });
         if (filePath) {
@@ -237,7 +229,7 @@ function _convertSheetToFiles(langsInfoModel, contentTemplate, templateExt, opti
     });
 }
 function convertSheetToJsonFiles(langsInfoModel, options) {
-    _convertSheetToFiles(langsInfoModel, JSON_TEMPLATE, '.json', options);
+    _convertSheetToFiles(langsInfoModel, json_1.default, '.json', options);
 }
 exports.convertSheetToJsonFiles = convertSheetToJsonFiles;
 function createGetFilePathFunc(extStr) {
@@ -255,11 +247,10 @@ function convertSheetToJsonModuleFiles(langsInfoModel, options) {
 }
 exports.convertSheetToJsonModuleFiles = convertSheetToJsonModuleFiles;
 function convertSheetToTsFiles(langsInfoModel, options) {
-    _convertSheetToModuleFilesByTemplate(langsInfoModel, TS_TEMPLATE, '.ts', options);
+    _convertSheetToModuleFilesByTemplate(langsInfoModel, typescript_1.default, '.ts', options);
 }
 exports.convertSheetToTsFiles = convertSheetToTsFiles;
 //#endregion
-// console.log(JSON.stringify(result,null,2))
 //#region 模板文件
 /**
  * 模板文件
@@ -316,6 +307,9 @@ function convertExcelToFile(filePathList, options) {
             else {
                 _convertSheetToFiles(sheetResult, templateContent, templateExt, restOptions);
             }
+            break;
+        case 'xml':
+            _convertSheetToFiles(sheetResult, xml_1.default, '.xml', options);
             break;
         case 'json':
         default:

@@ -8,6 +8,10 @@ import { tryToSaveFileSync } from './utils'
 import path from 'path'
 import fs from 'fs'
 import LangsInfoModel from './LangsInfoModel';
+import TS_TEMPLATE from './template/typescript'
+import JSON_TEMPLATE from './template/json'
+import XML_TEMPLATE from './template/xml'
+
 const doT =require('dot')
 
 doT.templateSettings.strip=false
@@ -185,17 +189,6 @@ export function updateLangsInfoModelFromSheetData(
 //#region 文件生成
 
 
-const JSON_TEMPLATE=`
-{{=it.moduleJsonString}}
-`
-const TS_TEMPLATE_TYPE_NAME="LANGINFO_{{=(it.moduleName||'ROOT').toUpperCase()}}"
-const TS_TEMPLATE_MODULE_NAME="LangInfo{{!it.moduleName}}"
-const TS_TEMPLATE=`{{? it.langName.toLowerCase()!=='en'}}import { ${TS_TEMPLATE_MODULE_NAME} } from './en'
-{{?}}const ${TS_TEMPLATE_TYPE_NAME}{{? it.langName.toLowerCase()!=='en'}}:${TS_TEMPLATE_MODULE_NAME}{{?}} = {{=it.moduleJsonString}}
-{{?it.langName.toLowerCase()==='en'}}export type ${TS_TEMPLATE_MODULE_NAME} = typeof ${TS_TEMPLATE_TYPE_NAME}{{?}}
-export default ${TS_TEMPLATE_TYPE_NAME}
-`
-
 export interface IConvertFileOption {
   /**
    * 默认当前目录的dist-lang
@@ -255,7 +248,7 @@ function _convertSheetToModuleFiles(
   if (!fs.existsSync(pathStr)) {
     fs.mkdirSync(pathStr)
   }
-  langsInfoModel.forEachModule(({moduleObj,moduleName,langName})=>{
+  langsInfoModel.forEachModule(({moduleObj,moduleName,langName,langModel})=>{
     const filePath = getFileName({
       langName,
       moduleName:moduleName||undefined,
@@ -316,6 +309,7 @@ function _convertSheetToFiles(langsInfoModel: LangsInfoModel,
       langName,
       destDirPath:pathStr,
       moduleJsonString:JSON.stringify(moduleObj, null, 2),
+      fieldsList: model.fieldsList,
       moduleObj:moduleObj
     })
     if (filePath) {
@@ -373,7 +367,6 @@ export function convertSheetToTsFiles(
 }
 //#endregion
 
-// console.log(JSON.stringify(result,null,2))
 
 //#region 模板文件
 
@@ -417,12 +410,13 @@ export function convertExcelToFile(
     sheetIdx?: number
     /**
      * json： 每个语言一个文件
+     * xml: 已有模板 ，每个语言一个文件
      * json-module:已有模板，每个语言每个模块一个文件
      * ts: 已有模板 ，每个语言每个模块一个文件
      * custom: 自定义有模板，每个语言一个文件
      * custom-module: 自定义模板，每个语言一个文件
      */
-    fileType: 'json' | 'ts' |'json-module' |'custom'|'custom-module',
+    fileType: 'json' |'xml' | 'ts' |'json-module' |'custom'|'custom-module',
     /**
      * fileType为custom时有效
      * 自定义的模板路径，生成的文件ext为模板的后缀
@@ -479,6 +473,9 @@ export function convertExcelToFile(
         _convertSheetToFiles(sheetResult,templateContent,templateExt,restOptions)
       }
         break
+    case 'xml':
+      _convertSheetToFiles(sheetResult,XML_TEMPLATE,'.xml',options)
+      break;
     case 'json':
     default:
       convertSheetToJsonFiles(sheetResult, restOptions)
