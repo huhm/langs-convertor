@@ -23,10 +23,10 @@ npx lang-cvt -h
 npx lang-cvt -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist  --fileType xml
 
 # 转xlsx 为xml文件 fileType=xml
--f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --fileType xml
+npx lang-cvt -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --fileType xml
 
 # 转xlsx 为ts文件 fileType=ts
--f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --templateExcel ./dist/template.xlsx --fileType ts --missingMode placeholder
+npx lang-cvt -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --templateExcel ./dist/template.xlsx --fileType ts --missingMode placeholder
 ```
 
 
@@ -35,8 +35,15 @@ npx lang-cvt -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist  -
 + ID列(idCol)： 表示ID所在的列
   + ID列中数据为空时，表示该行不需要翻译
   + ID列支持多对一
-    + 一行数据对应多个ID
+    + 表格的一行数据对应多个ID
+    + 通过换行符分隔
+    + {IGNORE} 表示忽略该行
+    + {CONTINUE} 表示该行合并到上一行ID中
   + ID列重复时，以后面的ID列数据为准
+  + ID值规范
+    + namePath标识
+    + 用``.``标识对象
+    + 用``[n]``标识数组
 + 语言行(langNameRow)：表示语言简称所在的行
   + 语言行**有效语言**定义
     + 从ID列往后一列，同时非空的单元格
@@ -49,6 +56,42 @@ npx lang-cvt -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist  -
   + 有效语言所在列
   + 起始行 为**语言行**下一行
   + 所在行对应的ID有值
+
+
+1. 多行ID示例
+```
+// 下面内容表示，前两行内容为FieldName1的值，忽略第三行，第四行内容为FieldName2的值
+FieldName1
+{CONTINUE}
+{IGNORE}
+FieldName2
+```
+2. ID示例
+ID:
+``` txt
+Feedback.title
+Feedback.info.foo
+Feedback.info.boo
+Feedback.questions[0].title
+Feedback.questions[1].content
+```
+对应的json数据
+``` json
+{
+  "Feedback":{
+    "title":"",
+    "info":{
+      "foo":"",
+      "boo":""
+    },
+    "questions":[{
+      "title":"",
+    },{
+      "content":"",
+    }]
+  }
+}
+```
 
 ## excel 转 多语言包
 + 支持多excel转化
