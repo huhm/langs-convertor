@@ -1,4 +1,5 @@
 # langs-tool
+[![NPM version][npm-image]][npm-url]
 
 ## 命令行方式
 1. 安装 ``npm i langs-tool``
