@@ -88,7 +88,7 @@ function updateLangsInfoModelFromSheetData(sheetData, sheetResult, options) {
     if (!result) {
         result = new LangsInfoModel_1.default();
     }
-    for (let rowIdx = anchorCellPos[0] + 1; rowIdx < sheetData.length; rowIdx++) {
+    for (let rowIdx = langRowIdx + 1; rowIdx < sheetData.length; rowIdx++) {
         const row = sheetData[rowIdx];
         const rawId = row[idColIdx];
         if (!rawId) {
@@ -267,8 +267,8 @@ exports.convertSheetToTsFiles = convertSheetToTsFiles;
  * @param sheetIdx
  * @param options
  */
-function readTemplateFieldsMap(template, sheetIdx, options) {
-    const templateFieldsMap = {};
+function readTemplateFieldsSet(template, sheetIdx, options) {
+    const templateFieldsSet = new Set();
     if (template) {
         if (!fs_1.default.existsSync(template)) {
             throw new Error('template file is not exist:' + template);
@@ -276,24 +276,24 @@ function readTemplateFieldsMap(template, sheetIdx, options) {
         const sheetData = readSheetDataFromExcel(template, sheetIdx || 0);
         const templateModel = updateLangsInfoModelFromSheetData(sheetData, undefined, options);
         templateModel.forEachField((fieldItem) => {
-            templateFieldsMap[fieldItem.fieldName] = fieldItem.getValue() || templateFieldsMap[fieldItem.fieldName];
+            templateFieldsSet.add(fieldItem.fieldName);
         });
-        return templateFieldsMap;
+        return templateFieldsSet;
     }
 }
 //#endregion
 function convertExcelToFile(filePathList, options) {
     const _a = options || {}, { template, sheetIdx, fileType, customTemplatePath } = _a, restOptions = __rest(_a, ["template", "sheetIdx", "fileType", "customTemplatePath"]);
-    const templateFieldsMap = readTemplateFieldsMap(template, sheetIdx || 0, restOptions);
+    const templateFieldsSet = readTemplateFieldsSet(template, sheetIdx || 0, restOptions);
     const sheetResult = new LangsInfoModel_1.default();
     filePathList.forEach((filePath) => {
         const sheetData = readSheetDataFromExcel(filePath, sheetIdx || 0);
         // 2.将表格数据转换为多语言包
         updateLangsInfoModelFromSheetData(sheetData, sheetResult, restOptions);
     });
-    if (templateFieldsMap) {
+    if (templateFieldsSet) {
         // 按templateFieldsMap改造sheetResult
-        sheetResult.normalizeByTemplate(templateFieldsMap, restOptions);
+        sheetResult.normalizeByTemplate(templateFieldsSet, restOptions);
     }
     // 3. 转成文件
     switch (fileType) {

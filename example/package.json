@@ -12,6 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "langs-tool": "^2.0.0"
+    "langs-tool": "^2.0.1"
   }
 }

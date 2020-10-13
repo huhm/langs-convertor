@@ -22,9 +22,7 @@ export default class LangsInfoModel {
         moduleName?: string;
         langName: string;
     }) => void): void;
-    normalizeByTemplate(templateFieldsMap: {
-        [fieldName: string]: ILangObjValueTypeBase;
-    }, options: {
+    normalizeByTemplate(templateFieldsSet: Set<string>, options: {
         /**
          * 字段缺失策略
          * none:不设置

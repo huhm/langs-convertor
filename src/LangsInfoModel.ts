@@ -104,7 +104,7 @@ export default class LangsInfoModel {
 
   //#region normalizeByTemplate
   normalizeByTemplate(
-    templateFieldsMap: { [fieldName: string]: ILangObjValueTypeBase },
+    templateFieldsSet:Set<string>,
     options: {
       /**
        * 字段缺失策略
@@ -117,7 +117,7 @@ export default class LangsInfoModel {
   ) {
     // 1. delete the extra fields
     this.forEachField((fieldItem, langName) => {
-      if (!templateFieldsMap[fieldItem.fieldName]) {
+      if(!templateFieldsSet.has(fieldItem.fieldName)){
         this.deleteLangField(langName, fieldItem.fieldName)
       }
     })
@@ -125,7 +125,7 @@ export default class LangsInfoModel {
     // 2. add the exist fields?
     const { missingMode, missingValue } = options
     if (missingMode && missingMode !== 'none') {
-      Object.keys(templateFieldsMap).forEach((fieldName) => {
+      templateFieldsSet.forEach(fieldName=>{
         this.forEachLang((langModel) => {
           if (!langModel.isExist(fieldName)) {
             langModel.setField(fieldName, missingValue!).isPlaceHolder = true

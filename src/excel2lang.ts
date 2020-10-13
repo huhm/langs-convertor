@@ -104,7 +104,7 @@ export function updateLangsInfoModelFromSheetData(
     result=new LangsInfoModel()
   }
 
-  for (let rowIdx = anchorCellPos[0]+1; rowIdx < sheetData.length; rowIdx++) {
+  for (let rowIdx = langRowIdx+1; rowIdx < sheetData.length; rowIdx++) {
     const row = sheetData[rowIdx]
     const rawId = row[idColIdx]
     if (!rawId) {
@@ -383,12 +383,12 @@ export function convertSheetToTsFiles(
  * @param sheetIdx 
  * @param options 
  */
-function readTemplateFieldsMap(
+function readTemplateFieldsSet(
   template: string | undefined,
   sheetIdx: number,
   options: IConvertLangOption
 ) {
-  const templateFieldsMap = {} as { [fieldName: string]: ILangObjValueTypeBase }
+  const templateFieldsSet=new Set<string>()
   if (template) {
     if (!fs.existsSync(template)) {
       throw new Error('template file is not exist:' + template)
@@ -400,9 +400,9 @@ function readTemplateFieldsMap(
       options
     )
     templateModel.forEachField((fieldItem)=>{
-      templateFieldsMap[fieldItem.fieldName]=fieldItem.getValue()||templateFieldsMap[fieldItem.fieldName]
+      templateFieldsSet.add(fieldItem.fieldName)
     })
-    return templateFieldsMap
+    return templateFieldsSet
   }
 }
  
@@ -442,7 +442,7 @@ export function convertExcelToFile(
     IConvertFileOption 
 ) {
   const { template, sheetIdx, fileType,customTemplatePath, ...restOptions } = options || {}
-  const templateFieldsMap = readTemplateFieldsMap(
+  const templateFieldsSet = readTemplateFieldsSet(
     template,
     sheetIdx || 0,
     restOptions
@@ -454,9 +454,9 @@ export function convertExcelToFile(
     // 2.将表格数据转换为多语言包
     updateLangsInfoModelFromSheetData(sheetData, sheetResult, restOptions)
   })
-  if (templateFieldsMap) {
+  if (templateFieldsSet) {
     // 按templateFieldsMap改造sheetResult
-    sheetResult.normalizeByTemplate(templateFieldsMap,restOptions) 
+    sheetResult.normalizeByTemplate(templateFieldsSet,restOptions) 
   }
   // 3. 转成文件
   switch (fileType) {

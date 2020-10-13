@@ -86,17 +86,17 @@ class LangsInfoModel {
     }
     //#endregion
     //#region normalizeByTemplate
-    normalizeByTemplate(templateFieldsMap, options) {
+    normalizeByTemplate(templateFieldsSet, options) {
         // 1. delete the extra fields
         this.forEachField((fieldItem, langName) => {
-            if (!templateFieldsMap[fieldItem.fieldName]) {
+            if (!templateFieldsSet.has(fieldItem.fieldName)) {
                 this.deleteLangField(langName, fieldItem.fieldName);
             }
         });
         // 2. add the exist fields?
         const { missingMode, missingValue } = options;
         if (missingMode && missingMode !== 'none') {
-            Object.keys(templateFieldsMap).forEach((fieldName) => {
+            templateFieldsSet.forEach(fieldName => {
                 this.forEachLang((langModel) => {
                     if (!langModel.isExist(fieldName)) {
                         langModel.setField(fieldName, missingValue).isPlaceHolder = true;
