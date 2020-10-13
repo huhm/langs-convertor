@@ -1,5 +1,5 @@
 {
-  "name": "langs-convertor",
+  "name": "langs-tool",
   "version": "2.0.0",
   "description": "",
   "main": "bin/index.js",
@@ -11,6 +11,7 @@
     "lang-cvt": "bin/lang-cvt.js"
   },
   "author": "huhm2008@foxmail.com",
+  "keywords": ["i18n","excel","convert"],
   "license": "ISC",
   "homepage": "https://github.com/huhm/langs-convertor",
   "repository": {
@@ -30,8 +31,14 @@
     "@types/inquirer": "^7.3.1",
     "@types/node": "^14.11.2",
     "@types/node-xlsx": "^0.15.0",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint-config-prettier": "^6.11.0",
     "prettier": "2.1.2",
     "typescript": "^4.0.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

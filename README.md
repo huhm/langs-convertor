@@ -1,7 +1,7 @@
-# langs-convertor
+# langs-tool
 
 ## 命令行方式
-1. 安装 ``npm i lang-cvt``
+1. 安装 ``npm i langs-tool``
 2. 使用
 ``` bash
 # 查看帮助文档
@@ -39,7 +39,7 @@ npx lang-cvt -f ./first_lang*.xlsx ./sencond_lang*.xlsx -o ./dist/lang --langNam
 
 ``` js
 const path = require('path');
-const { convertExcelToFile } = require('langs-convertor')
+const { convertExcelToFile } = require('langs-tool')
 
 convertExcelToFile(['./excel/v1-complete.xlsx','./excel/v2-id.xlsx','./excel/v2-hi.xlsx'],{
     fileType:'ts',
@@ -63,7 +63,7 @@ langObject: {{=it.moduleJsonString}}
 
 ### 待翻译en语言转excel
 ``` js
-const { convertToExcel } = require('langs-convertor')
+const { convertToExcel } = require('langs-tool')
 convertToExcel({
     moduleName:{
         title:'sdfdsf',
@@ -84,7 +84,7 @@ convertToExcel({
 
 ### 现有语言包转基础excel
 ``` js
-const { convertMultiLangsToExcel,createLangModuleMapByFileGlob } = require('langs-convertor')
+const { convertMultiLangsToExcel,createLangModuleMapByFileGlob } = require('langs-tool')
 // 读取现有json 
 const fileContentMap=createLangModuleMapByFileGlob('./local/**/*.json',{
     convertToLangJson:(strContent)=>JSON.parse(strContent),
