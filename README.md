@@ -1,5 +1,5 @@
 # langs-tool
-[![NPM version][npm-image]][npm-url]
+[![npm version](https://badge.fury.io/js/langs-tool.svg)](https://badge.fury.io/js/langs-tool)
 
 ## 命令行方式
 1. 安装 ``npm i langs-tool``
