@@ -2,8 +2,12 @@ import xlsx from 'node-xlsx'
 import { ILangObj } from './interface'
 import { globFilesContentSync, tryToSaveFileSync } from './utils'
 import path from 'path'
-import { ConvertedLangItem, convertLangInfoToList } from './convert-utils'
-
+import {
+  IConvertedLangItem,
+  convertLangInfoToList,
+  DEFAULT_ID_TAG as ID_TAG,
+} from './convert-utils'
+import LangsInfoModel from './LangsInfoModel'
 
 export interface ILangExcelOption {
   /**
@@ -16,16 +20,9 @@ export interface ILangExcelOption {
    */
   sheetName?: string
 
-  /**
-   * 待翻译的语言列表(仅用来生成标题行)
-   * en,zh,ar...
-   */
+  // 自定义Excel头,如:[['[[ID]]','en']]
+  customHeaders?: string[][]
   langNameListToTranslate?: string[]
-
-  /**
-   * 待翻译的语言列表名称(仅用来生成标题行)
-   */
-  langTitleListToTranslate?: string[]
 }
 
 /**
@@ -34,22 +31,21 @@ export interface ILangExcelOption {
  * @param options
  */
 export function convertLangItemsToExcel(
-  list: ConvertedLangItem[],
+  list: IConvertedLangItem[],
   options?: ILangExcelOption
 ) {
-  const {
-    langNameListToTranslate,
-    langTitleListToTranslate,
-    sheetName,
-    output,
-  } = options || {}
+  const { sheetName, langNameListToTranslate, customHeaders, output } =
+    options || {}
   var xlsxData: string[][] = []
-  if (langTitleListToTranslate) {
-    xlsxData.push(['FieldPath(Dont modify!)', 'Content To Translate', ...langTitleListToTranslate])
-  }else{
-    xlsxData.push([])
+  if (customHeaders) {
+    xlsxData = xlsxData.concat(customHeaders)
+  } else {
+    xlsxData.push([
+      ID_TAG,
+      '[Content To Translate]',
+      ...(langNameListToTranslate || []),
+    ])
   }
-  xlsxData.push(['[[ID]]', '[Content To Translate]', ...(langNameListToTranslate || [])])
   list.forEach((item) => {
     xlsxData.push([item.name, item.value])
   })
@@ -65,7 +61,7 @@ export function convertLangItemsToExcel(
 
 export type IMultiLangExcelOption = Omit<
   ILangExcelOption,
-  'langNameListToTranslate' | 'langTitleListToTranslate'
+  'langNameListToTranslate' | 'customHeaders'
 >
 /**
  * 语言列表生成excel
@@ -74,7 +70,7 @@ export type IMultiLangExcelOption = Omit<
  */
 export function convertMultiLangsLangItemsMapToExcel(
   langMap: {
-    [langName: string]: ConvertedLangItem[]
+    [langName: string]: IConvertedLangItem[]
   },
   options?: IMultiLangExcelOption
 ) {
@@ -84,7 +80,7 @@ export function convertMultiLangsLangItemsMapToExcel(
     // namespace
   } = options || {}
   const idRowIdx = 0
-  var xlsxData: string[][] = [['[[ID]]']] // 语言标题行
+  var xlsxData: string[][] = [[ID_TAG]] // 语言标题行
 
   const fieldRowIdxMap = {} as { [fieldNamePath: string]: number }
 
@@ -129,7 +125,7 @@ export function convertMultiLangsToExcel(
   options?: IMultiLangExcelOption
 ) {
   const langMap2: {
-    [langName: string]: ConvertedLangItem[]
+    [langName: string]: IConvertedLangItem[]
   } = {}
   for (let langName in langMap) {
     langMap2[langName] = convertLangInfoToList(langMap[langName])
@@ -149,15 +145,14 @@ export function createLangModuleMapByFileGlob(
   fileGlobPath: string,
   options: {
     convertToLangJson: (fileContent: string) => ILangObj
-    basePath:
-      | string
+    basePath:string
       | ((filePath: string) => { modulePathList: string[]; langName: string })
   }
 ) {
   const { convertToLangJson, basePath } = options
   const fileContentMap = globFilesContentSync(fileGlobPath)
-  type LangType = ILangObj | { [moduleName: string]: ILangObj | LangType }
-  const jsonMap = {} as { [langName: string]: LangType }
+  
+  const jsonMap = {} as { [langName: string]: ILangObj }
   for (let filePath in fileContentMap) {
     let langName = ''
     let modulePathList: string[]
@@ -185,8 +180,65 @@ export function createLangModuleMapByFileGlob(
         lastMap = curMap
         curMap = curMap[pathItem]
       })
-      lastMap[modulePathList[modulePathList.length-1]] = jsonObj
+      lastMap[modulePathList[modulePathList.length - 1]] = jsonObj
     }
   }
   return jsonMap
+}
+
+/**
+ * 从多语言列表中生成语言缺失部分的excel
+ * 每个语言包一个文件
+ * @param langMap
+ * @param options
+ */
+export function convertSubstractLangsToExcels(
+  langMap: { [langName: string]: ILangObj },
+  fromLangName: string,
+  options?: {
+    /**
+     * 生成的文件路径（文件名为{langName}.xlsx）
+     * 默认值为process.cwd()
+     */
+    output?: string
+    /**
+     * sheet名称，默认'Default'
+     */
+    sheetName?: string
+    /**
+     * 空数据占位符前缀，以placeholderPrefix开头的数据视为空数据
+     */
+    placeholderPrefix?: string
+  }
+) {
+  const { output, sheetName, placeholderPrefix } = options || {}
+  const langsModel = new LangsInfoModel()
+  const excelPathDir = output || path.join(process.cwd(), './dist.trans')
+  langsModel.setLangFields(fromLangName, langMap[fromLangName])
+  const filePath = path.join(excelPathDir, `./template_${fromLangName}.xlsx`)
+  console.log('Created Complete Excel for ' + fromLangName)
+  convertLangItemsToExcel(
+    langsModel.getLangInfoModel(fromLangName).fieldsList,
+    {
+      sheetName: sheetName || fromLangName,
+      output: filePath,
+      customHeaders: [[ID_TAG, fromLangName]],
+    }
+  )
+  for (let langName in langMap) {
+    if (langName === fromLangName) {
+      continue
+    }
+    langsModel.setLangFields(langName, langMap[langName])
+    const list = langsModel.substractLangSet(fromLangName, langName, {
+      placeholderPrefix,
+    })
+    const filePath = path.join(excelPathDir, `./${langName}.xlsx`)
+    console.log('Created Substract Excel for ' + langName)
+    convertLangItemsToExcel(list, {
+      sheetName: sheetName || langName,
+      output: filePath,
+      langNameListToTranslate:[langName]
+    })
+  }
 }

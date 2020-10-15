@@ -24,6 +24,13 @@ class LangInfoItemModel {
     getNamePathList() {
         return utils_1.convertNamePath(this._fieldName);
     }
+    //#region IConvertedLangItem
+    get name() {
+        return this._fieldName;
+    }
+    get value() {
+        return this._fieldValue;
+    }
 }
 exports.LangInfoItemModel = LangInfoItemModel;
 /**
@@ -52,6 +59,12 @@ class LangInfoModel {
             }
         }
     }
+    setFields(langInfo) {
+        const list = convert_utils_1.convertLangInfoToList(langInfo);
+        list.forEach(item => {
+            this.setField(item.name, item.value);
+        });
+    }
     setField(fieldNamePath, fieldValue) {
         const oldVal = this._plainMap[fieldNamePath];
         let fieldItem;
@@ -66,6 +79,9 @@ class LangInfoModel {
         }
         this._plainMap[fieldNamePath] = newVal;
         return fieldItem;
+    }
+    getFieldValue(fieldNamePath) {
+        return this._plainMap[fieldNamePath];
     }
     isExist(fieldNamePath) {
         return !!this._plainMap[fieldNamePath];

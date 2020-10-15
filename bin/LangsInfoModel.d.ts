@@ -4,8 +4,26 @@ export default class LangsInfoModel {
     private _map;
     constructor();
     private _getOrCreateLangInfoModel;
+    getLangInfoModel(langName: string): LangInfoModel;
+    /**
+     * 设置语言字段
+     * @param langName
+     * @param fieldNamePath
+     * @param fieldValue
+     */
     setLangField(langName: string, fieldNamePath: string, fieldValue: ILangObjValueTypeBase): LangInfoItemModel;
+    /**
+     * 删除语言字段
+     * @param langName
+     * @param fieldNamePath
+     */
     deleteLangField(langName: string, fieldNamePath: string): void;
+    /**
+     * 批量设置字段
+     * @param langName
+     * @param langInfo
+     */
+    setLangFields(langName: string, langInfo: ILangObj): void;
     toLangsInfoObj(): LangsInfo;
     forEachLang(func: (langVal: LangInfoModel, langName: string) => void): void;
     /**
@@ -32,4 +50,16 @@ export default class LangsInfoModel {
         missingMode?: 'none' | 'placeholder';
         missingValue?: string;
     }): void;
+    /**
+     * 计算两个语言包的差集 fromLangName-langName
+     * @param fromLangName
+     * @param langName
+     * @param options
+     */
+    substractLangSet(fromLangName: string, langName: string, options?: {
+        /**
+         * 空数据占位符前缀，以placeholderPrefix开头的数据视为空数据
+         */
+        placeholderPrefix?: string;
+    }): LangInfoItemModel[];
 }

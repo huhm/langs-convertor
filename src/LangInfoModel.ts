@@ -1,13 +1,16 @@
 import {
+  convertLangInfoToList,
   convertPlainLangInfoToLangInfo,
+  IConvertedLangItem
 } from './convert-utils'
 import {
+  ILangObj,
   ILangObjValueTypeBase,
   IPlainLangInfo,
 } from './interface'
 import { convertNamePath } from './utils'
 
-export class LangInfoItemModel {
+export class LangInfoItemModel implements IConvertedLangItem {
   private _fieldName: string
   get fieldName() {
     return this._fieldName
@@ -27,6 +30,8 @@ export class LangInfoItemModel {
     this._fieldValue = v
   }
 
+  
+
   getValue() {
     return this._fieldValue
   }
@@ -35,6 +40,15 @@ export class LangInfoItemModel {
       return convertNamePath(this._fieldName)
   }
  
+  //#region IConvertedLangItem
+  get name(){
+    return this._fieldName
+  }
+
+  get value(){
+    return this._fieldValue
+  }
+  //#endregion
 }
 
 /**
@@ -71,6 +85,13 @@ export default class LangInfoModel {
     }
   }
 
+  setFields(langInfo:ILangObj){
+    const list = convertLangInfoToList(langInfo)
+    list.forEach(item=>{
+      this.setField(item.name,item.value)
+    })
+  }
+
   setField(fieldNamePath: string, fieldValue: ILangObjValueTypeBase) {
     const oldVal = this._plainMap[fieldNamePath]
     let fieldItem:LangInfoItemModel
@@ -86,6 +107,9 @@ export default class LangInfoModel {
     return fieldItem
   }
 
+  getFieldValue(fieldNamePath:string){
+    return this._plainMap[fieldNamePath]
+  }
 
   isExist(fieldNamePath:string){
     return !!this._plainMap[fieldNamePath]

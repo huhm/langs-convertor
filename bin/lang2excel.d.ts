@@ -1,5 +1,5 @@
 import { ILangObj } from './interface';
-import { ConvertedLangItem } from './convert-utils';
+import { IConvertedLangItem } from './convert-utils';
 export interface ILangExcelOption {
     /**
      * 生成的文件地址
@@ -10,32 +10,25 @@ export interface ILangExcelOption {
      * sheet名称，默认'Default'
      */
     sheetName?: string;
-    /**
-     * 待翻译的语言列表(仅用来生成标题行)
-     * en,zh,ar...
-     */
+    customHeaders?: string[][];
     langNameListToTranslate?: string[];
-    /**
-     * 待翻译的语言列表名称(仅用来生成标题行)
-     */
-    langTitleListToTranslate?: string[];
 }
 /**
  * 语言列表生成excel
  * @param list
  * @param options
  */
-export declare function convertLangItemsToExcel(list: ConvertedLangItem[], options?: ILangExcelOption): void;
-export declare type IMultiLangExcelOption = Omit<ILangExcelOption, 'langNameListToTranslate' | 'langTitleListToTranslate'>;
+export declare function convertLangItemsToExcel(list: IConvertedLangItem[], options?: ILangExcelOption): void;
+export declare type IMultiLangExcelOption = Omit<ILangExcelOption, 'langNameListToTranslate' | 'customHeaders'>;
 /**
  * 语言列表生成excel
  * @param list
  * @param options
  */
 export declare function convertMultiLangsLangItemsMapToExcel(langMap: {
-    [langName: string]: ConvertedLangItem[];
+    [langName: string]: IConvertedLangItem[];
 }, options?: IMultiLangExcelOption): void;
-export declare function convertToExcel(langObj: ILangObj, options?: ILangExcelOption): ConvertedLangItem[];
+export declare function convertToExcel(langObj: ILangObj, options?: ILangExcelOption): IConvertedLangItem[];
 /**
  * 多语言列表生成excel
  * @param langMap
@@ -44,7 +37,7 @@ export declare function convertToExcel(langObj: ILangObj, options?: ILangExcelOp
 export declare function convertMultiLangsToExcel(langMap: {
     [langName: string]: ILangObj;
 }, options?: IMultiLangExcelOption): {
-    [langName: string]: ConvertedLangItem[];
+    [langName: string]: IConvertedLangItem[];
 };
 /**
  * 生成多语言模块对象
@@ -60,7 +53,28 @@ export declare function createLangModuleMapByFileGlob(fileGlobPath: string, opti
         langName: string;
     });
 }): {
-    [langName: string]: ILangObj | {
-        [moduleName: string]: ILangObj | any;
-    };
+    [langName: string]: ILangObj;
 };
+/**
+ * 从多语言列表中生成语言缺失部分的excel
+ * 每个语言包一个文件
+ * @param langMap
+ * @param options
+ */
+export declare function convertSubstractLangsToExcels(langMap: {
+    [langName: string]: ILangObj;
+}, fromLangName: string, options?: {
+    /**
+     * 生成的文件路径（文件名为{langName}.xlsx）
+     * 默认值为process.cwd()
+     */
+    output?: string;
+    /**
+     * sheet名称，默认'Default'
+     */
+    sheetName?: string;
+    /**
+     * 空数据占位符前缀，以placeholderPrefix开头的数据视为空数据
+     */
+    placeholderPrefix?: string;
+}): void;

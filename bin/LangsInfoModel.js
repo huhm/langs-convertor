@@ -8,22 +8,47 @@ class LangsInfoModel {
     constructor() {
         this._map = {};
     }
+    //#region 数据操作
     _getOrCreateLangInfoModel(langName) {
-        let v = this._map[langName];
+        let v = this.getLangInfoModel(langName);
         if (!v) {
             v = new LangInfoModel_1.default(langName);
             this._map[langName] = v;
         }
         return v;
     }
+    getLangInfoModel(langName) {
+        return this._map[langName];
+    }
+    /**
+     * 设置语言字段
+     * @param langName
+     * @param fieldNamePath
+     * @param fieldValue
+     */
     setLangField(langName, fieldNamePath, fieldValue) {
         const m = this._getOrCreateLangInfoModel(langName);
         return m.setField(fieldNamePath, fieldValue);
     }
+    /**
+     * 删除语言字段
+     * @param langName
+     * @param fieldNamePath
+     */
     deleteLangField(langName, fieldNamePath) {
         const m = this._getOrCreateLangInfoModel(langName);
         return m.deleteField(fieldNamePath);
     }
+    /**
+     * 批量设置字段
+     * @param langName
+     * @param langInfo
+     */
+    setLangFields(langName, langInfo) {
+        const m = this._getOrCreateLangInfoModel(langName);
+        m.setFields(langInfo);
+    }
+    //#endregion
     toLangsInfoObj() {
         let result = {};
         for (let langName in this._map) {
@@ -107,6 +132,27 @@ class LangsInfoModel {
                 });
             });
         }
+    }
+    //#endregion
+    //#region 集合运算
+    /**
+     * 计算两个语言包的差集 fromLangName-langName
+     * @param fromLangName
+     * @param langName
+     * @param options
+     */
+    substractLangSet(fromLangName, langName, options) {
+        const { placeholderPrefix } = options || {};
+        const resultList = [];
+        const fromLangModel = this._getOrCreateLangInfoModel(fromLangName);
+        const subLangModel = this._getOrCreateLangInfoModel(langName);
+        fromLangModel.fieldsList.forEach(item => {
+            const v = subLangModel.getFieldValue(item.fieldName);
+            if (!v || (placeholderPrefix && v.substr(0, placeholderPrefix.length) === placeholderPrefix)) {
+                resultList.push(item);
+            }
+        });
+        return resultList;
     }
 }
 exports.default = LangsInfoModel;

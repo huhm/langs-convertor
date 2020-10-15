@@ -23,6 +23,7 @@ const LangsInfoModel_1 = __importDefault(require("./LangsInfoModel"));
 const typescript_1 = __importDefault(require("./template/typescript"));
 const json_1 = __importDefault(require("./template/json"));
 const xml_1 = __importDefault(require("./template/xml"));
+const convert_utils_1 = require("./convert-utils");
 const doT = require('dot');
 doT.templateSettings.strip = false;
 // import fs from 'fs'
@@ -41,7 +42,7 @@ function normalizePathNameOrDirectiveTag(strId) {
  * 查找定位CELL(从左上角向右下角找)
  * @param sheedData
  */
-function findAnchorCell(sheetData, anchorCellTag = '[[ID]]') {
+function findAnchorCell(sheetData, anchorCellTag = convert_utils_1.DEFAULT_ID_TAG) {
     for (let r = 0; r < sheetData.length; r++) {
         const row = sheetData[r];
         for (let c = 0; c < row.length; c++) {

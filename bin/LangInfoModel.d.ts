@@ -1,5 +1,6 @@
-import { ILangObjValueTypeBase } from './interface';
-export declare class LangInfoItemModel {
+import { IConvertedLangItem } from './convert-utils';
+import { ILangObj, ILangObjValueTypeBase } from './interface';
+export declare class LangInfoItemModel implements IConvertedLangItem {
     private _fieldName;
     get fieldName(): string;
     private _fieldValue;
@@ -11,6 +12,8 @@ export declare class LangInfoItemModel {
     setValue(v: ILangObjValueTypeBase): void;
     getValue(): string;
     getNamePathList(): (string | number)[];
+    get name(): string;
+    get value(): string;
 }
 /**
  * 语言信息实体
@@ -23,8 +26,10 @@ export default class LangInfoModel {
     constructor(langName: string);
     private findLangItemInList;
     private indexOfLangItem;
+    setFields(langInfo: ILangObj): void;
     setField(fieldNamePath: string, fieldValue: ILangObjValueTypeBase): LangInfoItemModel;
+    getFieldValue(fieldNamePath: string): string;
     isExist(fieldNamePath: string): boolean;
     deleteField(fieldNamePath: string): void;
-    toLangObj(): import("./interface").ILangObj;
+    toLangObj(): ILangObj;
 }

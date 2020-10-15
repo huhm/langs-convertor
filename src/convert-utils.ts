@@ -6,7 +6,12 @@ import {
 } from './interface'
 import { convertNamePath, isImage } from './utils'
 
-export type ConvertedLangItem = { name: string; value: ILangObjValueTypeBase }
+
+export const DEFAULT_ID_TAG='[[ID]]'
+export interface IConvertedLangItem{ 
+   name: string;
+   value: ILangObjValueTypeBase
+}
 
 /**
  *
@@ -14,7 +19,7 @@ export type ConvertedLangItem = { name: string; value: ILangObjValueTypeBase }
  * @returns {key:string,value:string}[]
  */
 export function convertLangInfoToList(langObj: ILangObj) {
-  const langItemList: ConvertedLangItem[] = []
+  const langItemList: IConvertedLangItem[] = []
   function searchObj(obj: ILangObj, pathList: string[]) {
     for (const key in obj) {
       const langVal = obj[key]

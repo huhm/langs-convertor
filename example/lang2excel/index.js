@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const LangsConvertor = require('../../bin/index')
 
-const { convertToExcel,createLangModuleMapByFileGlob } = LangsConvertor
+const { convertToExcel,createLangModuleMapByFileGlob,convertSubstractLangsToExcels } = LangsConvertor
 
 console.log(__dirname)
 const langJsonPath = path.join(__dirname, './lang.json')
@@ -32,3 +32,8 @@ const jsonMap = createLangModuleMapByFileGlob(path.join(__dirname,'./local/**/*.
     basePath:path.join(__dirname,'./local')
 })
 console.log(jsonMap)
+
+convertSubstractLangsToExcels(jsonMap,'en',{
+    output:'dist/trans',
+    placeholderPrefix:'[TODO'
+})

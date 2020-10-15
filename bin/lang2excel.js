@@ -3,26 +3,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createLangModuleMapByFileGlob = exports.convertMultiLangsToExcel = exports.convertToExcel = exports.convertMultiLangsLangItemsMapToExcel = exports.convertLangItemsToExcel = void 0;
+exports.convertSubstractLangsToExcels = exports.createLangModuleMapByFileGlob = exports.convertMultiLangsToExcel = exports.convertToExcel = exports.convertMultiLangsLangItemsMapToExcel = exports.convertLangItemsToExcel = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const utils_1 = require("./utils");
 const path_1 = __importDefault(require("path"));
 const convert_utils_1 = require("./convert-utils");
+const LangsInfoModel_1 = __importDefault(require("./LangsInfoModel"));
 /**
  * 语言列表生成excel
  * @param list
  * @param options
  */
 function convertLangItemsToExcel(list, options) {
-    const { langNameListToTranslate, langTitleListToTranslate, sheetName, output, } = options || {};
+    const { sheetName, langNameListToTranslate, customHeaders, output } = options || {};
     var xlsxData = [];
-    if (langTitleListToTranslate) {
-        xlsxData.push(['FieldPath(Dont modify!)', 'Content To Translate', ...langTitleListToTranslate]);
+    if (customHeaders) {
+        xlsxData = xlsxData.concat(customHeaders);
     }
     else {
-        xlsxData.push([]);
+        xlsxData.push([
+            convert_utils_1.DEFAULT_ID_TAG,
+            '[Content To Translate]',
+            ...(langNameListToTranslate || []),
+        ]);
     }
-    xlsxData.push(['[[ID]]', '[Content To Translate]', ...(langNameListToTranslate || [])]);
     list.forEach((item) => {
         xlsxData.push([item.name, item.value]);
     });
@@ -44,7 +48,7 @@ exports.convertLangItemsToExcel = convertLangItemsToExcel;
 function convertMultiLangsLangItemsMapToExcel(langMap, options) {
     const { sheetName, output, } = options || {};
     const idRowIdx = 0;
-    var xlsxData = [['[[ID]]']]; // 语言标题行
+    var xlsxData = [[convert_utils_1.DEFAULT_ID_TAG]]; // 语言标题行
     const fieldRowIdxMap = {};
     let langIdx = xlsxData[idRowIdx].length;
     for (let langName in langMap) {
@@ -137,3 +141,39 @@ function createLangModuleMapByFileGlob(fileGlobPath, options) {
     return jsonMap;
 }
 exports.createLangModuleMapByFileGlob = createLangModuleMapByFileGlob;
+/**
+ * 从多语言列表中生成语言缺失部分的excel
+ * 每个语言包一个文件
+ * @param langMap
+ * @param options
+ */
+function convertSubstractLangsToExcels(langMap, fromLangName, options) {
+    const { output, sheetName, placeholderPrefix } = options || {};
+    const langsModel = new LangsInfoModel_1.default();
+    const excelPathDir = output || path_1.default.join(process.cwd(), './dist.trans');
+    langsModel.setLangFields(fromLangName, langMap[fromLangName]);
+    const filePath = path_1.default.join(excelPathDir, `./template_${fromLangName}.xlsx`);
+    console.log('Created Complete Excel for ' + fromLangName);
+    convertLangItemsToExcel(langsModel.getLangInfoModel(fromLangName).fieldsList, {
+        sheetName: sheetName || fromLangName,
+        output: filePath,
+        customHeaders: [[convert_utils_1.DEFAULT_ID_TAG, fromLangName]],
+    });
+    for (let langName in langMap) {
+        if (langName === fromLangName) {
+            continue;
+        }
+        langsModel.setLangFields(langName, langMap[langName]);
+        const list = langsModel.substractLangSet(fromLangName, langName, {
+            placeholderPrefix,
+        });
+        const filePath = path_1.default.join(excelPathDir, `./${langName}.xlsx`);
+        console.log('Created Substract Excel for ' + langName);
+        convertLangItemsToExcel(list, {
+            sheetName: sheetName || langName,
+            output: filePath,
+            langNameListToTranslate: [langName]
+        });
+    }
+}
+exports.convertSubstractLangsToExcels = convertSubstractLangsToExcels;

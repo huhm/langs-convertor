@@ -140,9 +140,46 @@ convertToExcel({
     }
 },{
     output:'./lang.xlsx',
-    langNameListToTranslate:[''],
-    langTitleListToTranslate:['']
+    langNameListToTranslate:['hi'],
 })
+
+```
+
+### json文件转多语言模块对象
+``` js
+const path = require('path')
+const { createLangModuleMapByFileGlob } = require('langs-tool')
+createLangModuleMapByFileGlob(path.join(__dirname,'./local/**/*.json'),{
+   convertToLangJson:(strContent)=>JSON.parse(strContent),
+    basePath:path.join(__dirname,'./local')
+})
+```
+
+### 现有语言包抽取未翻译部分，生成excel
+``` js
+const { convertSubstractLangsToExcels } = require('langs-tool')
+convertSubstractLangsToExcels({
+  en:{
+    moduleName:{
+        title:'sdfdsf',
+        list:['sd','sdf'],
+        obj:{
+            key1:'sdf'
+        }
+    },
+    module2:{
+        title:'sdf'
+    }
+},
+hi:{
+  moduleName:{title:'[TODO]'}
+}
+},{
+    output:'./dist.trans/',
+    langNameListToTranslate:['hi'],
+    placeholderPrefix:'[TODO]'
+})
+
 ```
 
 ### 现有语言包转基础excel

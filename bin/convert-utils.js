@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertPlainLangInfoToLangInfo = exports.convertLangInfoToList = void 0;
+exports.convertPlainLangInfoToLangInfo = exports.convertLangInfoToList = exports.DEFAULT_ID_TAG = void 0;
 const utils_1 = require("./utils");
+exports.DEFAULT_ID_TAG = '[[ID]]';
 /**
  *
  * @param langObj 待翻译的语言文件对象

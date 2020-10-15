@@ -11,6 +11,7 @@ import LangsInfoModel from './LangsInfoModel';
 import TS_TEMPLATE from './template/typescript'
 import JSON_TEMPLATE from './template/json'
 import XML_TEMPLATE from './template/xml'
+import { DEFAULT_ID_TAG } from './convert-utils'
 
 const doT =require('dot')
 
@@ -47,7 +48,7 @@ export interface IConvertLangOption {
  */
 function findAnchorCell(
   sheetData: string[][],
-  anchorCellTag: string = '[[ID]]'
+  anchorCellTag: string = DEFAULT_ID_TAG
 ) {
   for(let r=0;r<sheetData.length;r++){
     const row = sheetData[r]

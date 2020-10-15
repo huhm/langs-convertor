@@ -7,8 +7,10 @@ export default class LangsInfoModel {
     this._map = {}
   }
 
+  //#region 数据操作
+
   private _getOrCreateLangInfoModel(langName: string) {
-    let v = this._map[langName]
+    let v = this.getLangInfoModel(langName)
     if (!v) {
       v = new LangInfoModel(langName)
       this._map[langName] = v
@@ -16,6 +18,16 @@ export default class LangsInfoModel {
     return v
   }
 
+  getLangInfoModel(langName:string){
+    return this._map[langName]
+  }
+
+  /**
+   * 设置语言字段
+   * @param langName 
+   * @param fieldNamePath 
+   * @param fieldValue 
+   */
   setLangField(
     langName: string,
     fieldNamePath: string,
@@ -25,10 +37,27 @@ export default class LangsInfoModel {
     return m.setField(fieldNamePath, fieldValue)
   }
 
+  /**
+   * 删除语言字段
+   * @param langName 
+   * @param fieldNamePath 
+   */
   deleteLangField(langName: string, fieldNamePath: string) {
     const m = this._getOrCreateLangInfoModel(langName)
     return m.deleteField(fieldNamePath)
   }
+
+  /**
+   * 批量设置字段
+   * @param langName 
+   * @param langInfo 
+   */
+  setLangFields(langName:string,langInfo:ILangObj){
+    const m = this._getOrCreateLangInfoModel(langName)
+    m.setFields(langInfo)
+  }
+
+  //#endregion
 
   toLangsInfoObj() {
     let result: LangsInfo = {}
@@ -138,6 +167,33 @@ export default class LangsInfoModel {
         })
       })
     }
+  }
+  //#endregion
+
+  //#region 集合运算
+  /**
+   * 计算两个语言包的差集 fromLangName-langName
+   * @param fromLangName 
+   * @param langName 
+   * @param options 
+   */
+  substractLangSet(fromLangName:string,langName:string,options?:{
+    /**
+     * 空数据占位符前缀，以placeholderPrefix开头的数据视为空数据
+     */
+    placeholderPrefix?:string
+  }){
+    const {placeholderPrefix}=options||{}
+    const resultList:LangInfoItemModel[]=[]
+    const fromLangModel = this._getOrCreateLangInfoModel(fromLangName)
+    const subLangModel=this._getOrCreateLangInfoModel(langName);
+    fromLangModel.fieldsList.forEach(item=>{
+      const v=subLangModel.getFieldValue(item.fieldName)
+      if(!v || (placeholderPrefix && v.substr(0,placeholderPrefix.length)===placeholderPrefix)){
+        resultList.push(item)
+      }
+    })
+    return resultList;
   }
   //#endregion
 }

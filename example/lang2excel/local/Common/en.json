@@ -1,5 +1,7 @@
 {
     "Home": "Home",
     "FAQ": "FAQ",
-    "Policy": "Privacy Policy"
+    "Policy": "Privacy Policy",
+    "LackField":"extra field",
+    "TodoField":"TodoField field"
   }
