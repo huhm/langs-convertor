@@ -1,5 +1,5 @@
 # langs-tool
-[![npm version](https://badge.fury.io/js/langs-tool.svg)](https://badge.fury.io/js/langs-tool)
+[![npm version](https://badge.fury.io/js/langs-convertor.svg)](https://badge.fury.io/js/langs-convertor)
 
 ## Features
 + excel转json/typescript/自定义模板
