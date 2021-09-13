@@ -1,13 +1,12 @@
 import xlsx from 'node-xlsx'
-import { ILangObj } from './interface'
-import { globFilesContentSync, tryToSaveFileSync } from './utils'
 import path from 'path'
 import {
-  IConvertedLangItem,
   convertLangInfoToList,
-  DEFAULT_ID_TAG as ID_TAG,
+  DEFAULT_ID_TAG as ID_TAG, IConvertedLangItem
 } from './convert-utils'
+import { ILangObj } from './interface'
 import LangsInfoModel from './LangsInfoModel'
+import { globFilesContentSync, tryToSaveFileSync } from './utils'
 
 export interface ILangExcelOption {
   /**
@@ -55,7 +54,7 @@ export function convertLangItemsToExcel(
       data: xlsxData,
     },
   ])
-  let filePath = path.join(process.cwd(), output || './lang.xlsx')
+  let filePath = path.resolve(process.cwd(), output || './lang.xlsx')
   tryToSaveFileSync(filePath, new Uint8Array(xlsxFile))
 }
 
@@ -105,7 +104,7 @@ export function convertMultiLangsLangItemsMapToExcel(
       data: xlsxData,
     },
   ])
-  let filePath = path.join(process.cwd(), output || './lang-base.xlsx')
+  let filePath = path.resolve(process.cwd(), output || './lang-base.xlsx')
   tryToSaveFileSync(filePath, new Uint8Array(xlsxFile))
 }
 
@@ -145,13 +144,13 @@ export function createLangModuleMapByFileGlob(
   fileGlobPath: string,
   options: {
     convertToLangJson: (fileContent: string) => ILangObj
-    basePath:string
-      | ((filePath: string) => { modulePathList: string[]; langName: string })
+    basePath: string
+    | ((filePath: string) => { modulePathList: string[]; langName: string })
   }
 ) {
   const { convertToLangJson, basePath } = options
   const fileContentMap = globFilesContentSync(fileGlobPath)
-  
+
   const jsonMap = {} as { [langName: string]: ILangObj }
   for (let filePath in fileContentMap) {
     let langName = ''
@@ -213,9 +212,9 @@ export function convertSubstractLangsToExcels(
 ) {
   const { output, sheetName, placeholderPrefix } = options || {}
   const langsModel = new LangsInfoModel()
-  const excelPathDir = output || path.join(process.cwd(), './dist.trans')
+  const excelPathDir = output || path.resolve(process.cwd(), './dist.trans')
   langsModel.setLangFields(fromLangName, langMap[fromLangName])
-  const filePath = path.join(excelPathDir, `./template_${fromLangName}.xlsx`)
+  const filePath = path.resolve(excelPathDir, `./template_${fromLangName}.xlsx`)
   console.log('Created Complete Excel for ' + fromLangName)
   convertLangItemsToExcel(
     langsModel.getLangInfoModel(fromLangName).fieldsList,
@@ -233,12 +232,12 @@ export function convertSubstractLangsToExcels(
     const list = langsModel.substractLangSet(fromLangName, langName, {
       placeholderPrefix,
     })
-    const filePath = path.join(excelPathDir, `./${langName}.xlsx`)
+    const filePath = path.resolve(excelPathDir, `./${langName}.xlsx`)
     console.log('Created Substract Excel for ' + langName)
     convertLangItemsToExcel(list, {
       sheetName: sheetName || langName,
       output: filePath,
-      langNameListToTranslate:[langName]
+      langNameListToTranslate: [langName]
     })
   }
 }

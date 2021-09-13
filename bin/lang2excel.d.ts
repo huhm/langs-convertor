@@ -1,5 +1,5 @@
-import { ILangObj } from './interface';
 import { IConvertedLangItem } from './convert-utils';
+import { ILangObj } from './interface';
 export interface ILangExcelOption {
     /**
      * 生成的文件地址

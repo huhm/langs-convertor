@@ -1,6 +1,6 @@
 {
   "name": "langs-convertor",
-  "version": "2.0.7",
+  "version": "2.0.9",
   "description": "excel convert to json/xml/ts or json convert to excel",
   "main": "bin/index.js",
   "types": "bin/index.d.ts",
@@ -12,10 +12,16 @@
     "lang-cvt": "bin/lang-cvt.js"
   },
   "author": "huhm2008@foxmail.com",
-  "keywords": ["i18n","excel","convert"],
+  "keywords": [
+    "i18n",
+    "excel",
+    "convert"
+  ],
   "license": "ISC",
   "homepage": "https://github.com/huhm/langs-convertor",
-  "publishConfig": { "registry": "https://registry.npmjs.org" },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/huhm/langs-convertor.git"

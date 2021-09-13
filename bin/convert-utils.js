@@ -18,7 +18,7 @@ function convertLangInfoToList(langObj) {
             }
             if (typeof langVal === 'string') {
                 const namePath = [...pathList, key];
-                if (!utils_1.isImage(langVal)) {
+                if (!(0, utils_1.isImage)(langVal)) {
                     langItemList.push({
                         name: namePath.join('.'),
                         value: langVal,
@@ -39,7 +39,7 @@ function convertLangInfoToList(langObj) {
         langVal.forEach((item, idx) => {
             const path = [...pathList, `${key}[${idx}]`];
             if (typeof item === 'string' || typeof item === 'number') {
-                if (!utils_1.isImage(item)) {
+                if (!(0, utils_1.isImage)(item)) {
                     langItemList.push({
                         name: path.join('.'),
                         value: item,
@@ -75,7 +75,7 @@ exports.convertPlainLangInfoToLangInfo = convertPlainLangInfoToLangInfo;
  * @param langResult
  */
 function setLangResult(langResult, namePath, langValue) {
-    const namePathList = utils_1.convertNamePath(namePath);
+    const namePathList = (0, utils_1.convertNamePath)(namePath);
     if (!langValue) {
         return {
             namePath,

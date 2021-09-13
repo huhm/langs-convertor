@@ -1,21 +1,19 @@
-import xlsx from 'node-xlsx'
-import {
-  ILangObj,
-  ILangObjValueTypeBase,
-  LangSummaryInfo,
-} from './interface'
-import { tryToSaveFileSync } from './utils'
-import path from 'path'
 import fs from 'fs'
-import LangsInfoModel from './LangsInfoModel';
-import TS_TEMPLATE from './template/typescript'
-import JSON_TEMPLATE from './template/json'
-import XML_TEMPLATE from './template/xml'
+import xlsx from 'node-xlsx'
+import path from 'path'
 import { DEFAULT_ID_TAG } from './convert-utils'
+import {
+  ILangObj, LangSummaryInfo
+} from './interface'
+import LangsInfoModel from './LangsInfoModel'
+import JSON_TEMPLATE from './template/json'
+import TS_TEMPLATE from './template/typescript'
+import XML_TEMPLATE from './template/xml'
+import { tryToSaveFileSync } from './utils'
 
-const doT =require('dot')
+const doT = require('dot')
 
-doT.templateSettings.strip=false
+doT.templateSettings.strip = false
 // import fs from 'fs'
 export function readSheetDataFromExcel(filePath: string, sheetIdx: number) {
   const workSheets = xlsx.parse(filePath)
@@ -31,7 +29,7 @@ function normalizePathNameOrDirectiveTag(strId: string) {
   return (strId || TAG_IGNORE).trim() || TAG_IGNORE
 }
 
- 
+
 
 
 export interface IConvertLangOption {
@@ -39,7 +37,7 @@ export interface IConvertLangOption {
    * 定位ID列和语言行的位置
    * 默认0
    */
-  anchorCellPos?: [number,number]
+  anchorCellPos?: [number, number]
 }
 
 /**
@@ -50,14 +48,14 @@ function findAnchorCell(
   sheetData: string[][],
   anchorCellTag: string = DEFAULT_ID_TAG
 ) {
-  for(let r=0;r<sheetData.length;r++){
+  for (let r = 0; r < sheetData.length; r++) {
     const row = sheetData[r]
-    for(let c=0;c<row.length;c++){
+    for (let c = 0; c < row.length; c++) {
       let cell = row[c]
       if (cell) {
         cell = cell.trim()
         if (cell === anchorCellTag) {
-          return [r,c]
+          return [r, c]
         }
       }
     }
@@ -76,27 +74,27 @@ export function updateLangsInfoModelFromSheetData(
   sheetResult?: LangsInfoModel,
   options?: IConvertLangOption
 ) {
-  const anchorCellPos=(options||{}).anchorCellPos || findAnchorCell(sheetData);
-  if(!anchorCellPos){
+  const anchorCellPos = (options || {}).anchorCellPos || findAnchorCell(sheetData);
+  if (!anchorCellPos) {
     throw new Error('Cant find [[ID]] cell (Anchor Cell)')
   }
-  const [langRowIdx,idColIdx]=anchorCellPos
+  const [langRowIdx, idColIdx] = anchorCellPos
   const langSummaryInfoList = convertLangSummaryInfoRowList(
     sheetData[langRowIdx],
-    idColIdx+1
+    idColIdx + 1
   )
 
-  function convertLangSummaryInfoRowList(row: string[],fromIdCol:number) {
+  function convertLangSummaryInfoRowList(row: string[], fromIdCol: number) {
     const result: LangSummaryInfo[] = []
-    for(let idx=fromIdCol;idx<row.length;idx++){
-      let cell=row[idx]
+    for (let idx = fromIdCol; idx < row.length; idx++) {
+      let cell = row[idx]
       if (!cell) {
         continue
       }
-      cell=cell.trim()
-      if(cell.includes('[')||cell.includes(']')){
+      cell = cell.trim()
+      if (cell.includes('[') || cell.includes(']')) {
         continue;
-      }      
+      }
       result.push({
         name: cell,
         col: idx,
@@ -105,11 +103,11 @@ export function updateLangsInfoModelFromSheetData(
     return result
   }
   let result = sheetResult
-  if(!result){
-    result=new LangsInfoModel()
+  if (!result) {
+    result = new LangsInfoModel()
   }
 
-  for (let rowIdx = langRowIdx+1; rowIdx < sheetData.length; rowIdx++) {
+  for (let rowIdx = langRowIdx + 1; rowIdx < sheetData.length; rowIdx++) {
     const row = sheetData[rowIdx]
     const rawId = row[idColIdx]
     if (!rawId) {
@@ -132,7 +130,7 @@ export function updateLangsInfoModelFromSheetData(
           )
           curVal = strValList.join('\r\n')
         }
-        result?.setLangField(summaryItem.name,idSearchInfo.namePath,curVal)
+        result?.setLangField(summaryItem.name, idSearchInfo.namePath, curVal)
       })
     })
   }
@@ -142,7 +140,7 @@ export function updateLangsInfoModelFromSheetData(
     toIdx: number
     namePath: string
   }
-  
+
   function normalizeIDSearchInfo(idCellStr: string) {
     const idList = idCellStr.trim().replace(/\r/g, '').split('\n')
     const result: IDSearchInfo[] = []
@@ -182,7 +180,7 @@ export function updateLangsInfoModelFromSheetData(
     }
     return result
   }
-  
+
   return result
 }
 //#endregion
@@ -227,13 +225,13 @@ export interface IConvertFileOption {
  */
 function _convertSheetToModuleFiles(
   langsInfoModel: LangsInfoModel,
-  moduleContentConvertor:(moduleInfo:{
-    langName:string,
-    moduleName?:string,
+  moduleContentConvertor: (moduleInfo: {
+    langName: string,
+    moduleName?: string,
     destDirPath: string,
-    moduleObj:ILangObj,
-    moduleJsonString:string,
-  })=>string,
+    moduleObj: ILangObj,
+    moduleJsonString: string,
+  }) => string,
   options?: IConvertFileOption
 ) {
   const { output, getFileName: _getFileName, clear } = options || {}
@@ -249,36 +247,36 @@ function _convertSheetToModuleFiles(
   if (!fs.existsSync(pathStr)) {
     fs.mkdirSync(pathStr)
   }
-  langsInfoModel.forEachModule(({moduleObj,moduleName,langName,langModel})=>{
+  langsInfoModel.forEachModule(({ moduleObj, moduleName, langName, langModel }) => {
     const filePath = getFileName({
       langName,
-      moduleName:moduleName||undefined,
+      moduleName: moduleName || undefined,
       destDirPath: pathStr,
     })
     if (filePath) {
       console.log('Start create', filePath)
 
-      let strContent =moduleContentConvertor({
+      let strContent = moduleContentConvertor({
         langName,
         moduleName,
         moduleObj,
-        moduleJsonString:JSON.stringify(moduleObj, null, 2),
-        destDirPath:pathStr
+        moduleJsonString: JSON.stringify(moduleObj, null, 2),
+        destDirPath: pathStr
       })
-      
+
       tryToSaveFileSync(filePath, strContent)
     }
-  }) 
+  })
 }
 function _convertSheetToModuleFilesByTemplate(
   langsInfoModel: LangsInfoModel,
-  templateContent:string,
-  templateExt:string,
+  templateContent: string,
+  templateExt: string,
   options?: IConvertFileOption
 ) {
   const getFileName = options?.getFileName || createGetFilePathFunc(templateExt)
-  
-  _convertSheetToModuleFiles(langsInfoModel,doT.template(templateContent),{
+
+  _convertSheetToModuleFiles(langsInfoModel, doT.template(templateContent), {
     ...options,
     getFileName
   })
@@ -288,33 +286,33 @@ function _convertSheetToModuleFilesByTemplate(
  * 一个语言包一个文件
  */
 function _convertSheetToFiles(langsInfoModel: LangsInfoModel,
-  contentTemplate:string,
-  templateExt:string,
-  options?: IConvertFileOption){
+  contentTemplate: string,
+  templateExt: string,
+  options?: IConvertFileOption) {
   const { output, getFileName: _getFileName } = options || {}
   const pathStr = path.normalize(
     output || path.resolve(process.cwd(), './dist-lang')
   )
   const getFileName =
-    _getFileName || createGetFilePathFunc(templateExt) 
+    _getFileName || createGetFilePathFunc(templateExt)
   if (!fs.existsSync(pathStr)) {
     fs.mkdirSync(pathStr)
   }
-  langsInfoModel.forEachLang((model,langName)=>{
+  langsInfoModel.forEachLang((model, langName) => {
     const filePath = getFileName({
       langName,
       destDirPath: pathStr,
     })
-    const moduleObj=model.toLangObj()
+    const moduleObj = model.toLangObj()
     let strContent = doT.template(contentTemplate)({
       langName,
-      destDirPath:pathStr,
-      moduleJsonString:JSON.stringify(moduleObj, null, 2),
+      destDirPath: pathStr,
+      moduleJsonString: JSON.stringify(moduleObj, null, 2),
       fieldsList: model.fieldsList,
-      moduleObj:moduleObj
+      moduleObj: moduleObj
     })
     if (filePath) {
-      tryToSaveFileSync(filePath,strContent )
+      tryToSaveFileSync(filePath, strContent)
     }
   })
 }
@@ -323,10 +321,10 @@ export function convertSheetToJsonFiles(
   langsInfoModel: LangsInfoModel,
   options?: IConvertFileOption
 ) {
-  _convertSheetToFiles(langsInfoModel,JSON_TEMPLATE,'.json',options)
+  _convertSheetToFiles(langsInfoModel, JSON_TEMPLATE, '.json', options)
 }
 
-function createGetFilePathFunc(extStr:string){
+function createGetFilePathFunc(extStr: string) {
   return function (info: {
     langName: string
     moduleName?: string,
@@ -336,11 +334,11 @@ function createGetFilePathFunc(extStr:string){
       langName,
       moduleName,
       destDirPath,
-    }=info;
+    } = info;
     const filePath = path.resolve(
       destDirPath,
-      `./${moduleName||''}`,
-      langName + (extStr||'.json')
+      `./${moduleName || ''}`,
+      langName + (extStr || '.json')
     )
     return filePath
   }
@@ -364,7 +362,7 @@ export function convertSheetToTsFiles(
   langsInfoModel: LangsInfoModel,
   options?: IConvertFileOption
 ) {
-  _convertSheetToModuleFilesByTemplate(langsInfoModel,TS_TEMPLATE,'.ts',options)
+  _convertSheetToModuleFilesByTemplate(langsInfoModel, TS_TEMPLATE, '.ts', options)
 }
 //#endregion
 
@@ -382,24 +380,24 @@ function readTemplateFieldsSet(
   sheetIdx: number,
   options: IConvertLangOption
 ) {
-  const templateFieldsSet=new Set<string>()
+  const templateFieldsSet = new Set<string>()
   if (template) {
     if (!fs.existsSync(template)) {
       throw new Error('template file is not exist:' + template)
     }
     const sheetData = readSheetDataFromExcel(template, sheetIdx || 0)
     const templateModel = updateLangsInfoModelFromSheetData(
-      sheetData,
+      sheetData as string[][],
       undefined,
       options
     )
-    templateModel.forEachField((fieldItem)=>{
+    templateModel.forEachField((fieldItem) => {
       templateFieldsSet.add(fieldItem.fieldName)
     })
     return templateFieldsSet
   }
 }
- 
+
 //#endregion
 
 export function convertExcelToFile(
@@ -417,7 +415,7 @@ export function convertExcelToFile(
      * custom: 自定义有模板，每个语言一个文件
      * custom-module: 自定义模板，每个语言一个文件
      */
-    fileType: 'json' |'xml' | 'ts' |'json-module' |'custom'|'custom-module',
+    fileType: 'json' | 'xml' | 'ts' | 'json-module' | 'custom' | 'custom-module',
     /**
      * fileType为custom时有效
      * 自定义的模板路径，生成的文件ext为模板的后缀
@@ -428,15 +426,15 @@ export function convertExcelToFile(
      *  moduleObj:'多语言模块对象JSON对象'
      * }
      */
-    customTemplatePath?:string,
+    customTemplatePath?: string,
     /**
      * 模板字段（只有模板字段中的字段才会被翻译）
      */
     template?: string
   } & IConvertLangOption &
-    IConvertFileOption 
+    IConvertFileOption
 ) {
-  const { template, sheetIdx, fileType,customTemplatePath, ...restOptions } = options || {}
+  const { template, sheetIdx, fileType, customTemplatePath, ...restOptions } = options || {}
   const templateFieldsSet = readTemplateFieldsSet(
     template,
     sheetIdx || 0,
@@ -447,11 +445,11 @@ export function convertExcelToFile(
   filePathList.forEach((filePath) => {
     const sheetData = readSheetDataFromExcel(filePath, sheetIdx || 0)
     // 2.将表格数据转换为多语言包
-    updateLangsInfoModelFromSheetData(sheetData, sheetResult, restOptions)
+    updateLangsInfoModelFromSheetData(sheetData as string[][], sheetResult, restOptions)
   })
   if (templateFieldsSet) {
     // 按templateFieldsMap改造sheetResult
-    sheetResult.normalizeByTemplate(templateFieldsSet,restOptions) 
+    sheetResult.normalizeByTemplate(templateFieldsSet, restOptions)
   }
   // 3. 转成文件
   switch (fileType) {
@@ -463,19 +461,19 @@ export function convertExcelToFile(
       break
     case 'custom':
     case 'custom-module':
-      if(!customTemplatePath|| !fs.existsSync(customTemplatePath)){
+      if (!customTemplatePath || !fs.existsSync(customTemplatePath)) {
         throw new Error('customTemplatePath not defined')
       }
-      let templateContent=fs.readFileSync(customTemplatePath,'utf-8');
-      let templateExt=path.extname(customTemplatePath);
-      if(fileType==='custom-module'){
-        _convertSheetToModuleFilesByTemplate(sheetResult,templateContent,templateExt,restOptions)
-      }else{
-        _convertSheetToFiles(sheetResult,templateContent,templateExt,restOptions)
+      let templateContent = fs.readFileSync(customTemplatePath, 'utf-8');
+      let templateExt = path.extname(customTemplatePath);
+      if (fileType === 'custom-module') {
+        _convertSheetToModuleFilesByTemplate(sheetResult, templateContent, templateExt, restOptions)
+      } else {
+        _convertSheetToFiles(sheetResult, templateContent, templateExt, restOptions)
       }
-        break
+      break
     case 'xml':
-      _convertSheetToFiles(sheetResult,XML_TEMPLATE,'.xml',options)
+      _convertSheetToFiles(sheetResult, XML_TEMPLATE, '.xml', options)
       break;
     case 'json':
     default:

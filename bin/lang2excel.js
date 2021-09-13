@@ -5,10 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertSubstractLangsToExcels = exports.createLangModuleMapByFileGlob = exports.convertMultiLangsToExcel = exports.convertToExcel = exports.convertMultiLangsLangItemsMapToExcel = exports.convertLangItemsToExcel = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
-const utils_1 = require("./utils");
 const path_1 = __importDefault(require("path"));
 const convert_utils_1 = require("./convert-utils");
 const LangsInfoModel_1 = __importDefault(require("./LangsInfoModel"));
+const utils_1 = require("./utils");
 /**
  * 语言列表生成excel
  * @param list
@@ -36,8 +36,8 @@ function convertLangItemsToExcel(list, options) {
             data: xlsxData,
         },
     ]);
-    let filePath = path_1.default.join(process.cwd(), output || './lang.xlsx');
-    utils_1.tryToSaveFileSync(filePath, new Uint8Array(xlsxFile));
+    let filePath = path_1.default.resolve(process.cwd(), output || './lang.xlsx');
+    (0, utils_1.tryToSaveFileSync)(filePath, new Uint8Array(xlsxFile));
 }
 exports.convertLangItemsToExcel = convertLangItemsToExcel;
 /**
@@ -46,7 +46,9 @@ exports.convertLangItemsToExcel = convertLangItemsToExcel;
  * @param options
  */
 function convertMultiLangsLangItemsMapToExcel(langMap, options) {
-    const { sheetName, output, } = options || {};
+    const { sheetName, output,
+    // namespace
+     } = options || {};
     const idRowIdx = 0;
     var xlsxData = [[convert_utils_1.DEFAULT_ID_TAG]]; // 语言标题行
     const fieldRowIdxMap = {};
@@ -71,12 +73,12 @@ function convertMultiLangsLangItemsMapToExcel(langMap, options) {
             data: xlsxData,
         },
     ]);
-    let filePath = path_1.default.join(process.cwd(), output || './lang-base.xlsx');
-    utils_1.tryToSaveFileSync(filePath, new Uint8Array(xlsxFile));
+    let filePath = path_1.default.resolve(process.cwd(), output || './lang-base.xlsx');
+    (0, utils_1.tryToSaveFileSync)(filePath, new Uint8Array(xlsxFile));
 }
 exports.convertMultiLangsLangItemsMapToExcel = convertMultiLangsLangItemsMapToExcel;
 function convertToExcel(langObj, options) {
-    const list = convert_utils_1.convertLangInfoToList(langObj);
+    const list = (0, convert_utils_1.convertLangInfoToList)(langObj);
     convertLangItemsToExcel(list, options);
     return list;
 }
@@ -89,7 +91,7 @@ exports.convertToExcel = convertToExcel;
 function convertMultiLangsToExcel(langMap, options) {
     const langMap2 = {};
     for (let langName in langMap) {
-        langMap2[langName] = convert_utils_1.convertLangInfoToList(langMap[langName]);
+        langMap2[langName] = (0, convert_utils_1.convertLangInfoToList)(langMap[langName]);
     }
     convertMultiLangsLangItemsMapToExcel(langMap2, options);
     return langMap2;
@@ -104,7 +106,7 @@ exports.convertMultiLangsToExcel = convertMultiLangsToExcel;
  */
 function createLangModuleMapByFileGlob(fileGlobPath, options) {
     const { convertToLangJson, basePath } = options;
-    const fileContentMap = utils_1.globFilesContentSync(fileGlobPath);
+    const fileContentMap = (0, utils_1.globFilesContentSync)(fileGlobPath);
     const jsonMap = {};
     for (let filePath in fileContentMap) {
         let langName = '';
@@ -150,9 +152,9 @@ exports.createLangModuleMapByFileGlob = createLangModuleMapByFileGlob;
 function convertSubstractLangsToExcels(langMap, fromLangName, options) {
     const { output, sheetName, placeholderPrefix } = options || {};
     const langsModel = new LangsInfoModel_1.default();
-    const excelPathDir = output || path_1.default.join(process.cwd(), './dist.trans');
+    const excelPathDir = output || path_1.default.resolve(process.cwd(), './dist.trans');
     langsModel.setLangFields(fromLangName, langMap[fromLangName]);
-    const filePath = path_1.default.join(excelPathDir, `./template_${fromLangName}.xlsx`);
+    const filePath = path_1.default.resolve(excelPathDir, `./template_${fromLangName}.xlsx`);
     console.log('Created Complete Excel for ' + fromLangName);
     convertLangItemsToExcel(langsModel.getLangInfoModel(fromLangName).fieldsList, {
         sheetName: sheetName || fromLangName,
@@ -167,7 +169,7 @@ function convertSubstractLangsToExcels(langMap, fromLangName, options) {
         const list = langsModel.substractLangSet(fromLangName, langName, {
             placeholderPrefix,
         });
-        const filePath = path_1.default.join(excelPathDir, `./${langName}.xlsx`);
+        const filePath = path_1.default.resolve(excelPathDir, `./${langName}.xlsx`);
         console.log('Created Substract Excel for ' + langName);
         convertLangItemsToExcel(list, {
             sheetName: sheetName || langName,

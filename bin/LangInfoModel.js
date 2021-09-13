@@ -22,7 +22,7 @@ class LangInfoItemModel {
         return this._fieldValue;
     }
     getNamePathList() {
-        return utils_1.convertNamePath(this._fieldName);
+        return (0, utils_1.convertNamePath)(this._fieldName);
     }
     //#region IConvertedLangItem
     get name() {
@@ -60,7 +60,7 @@ class LangInfoModel {
         }
     }
     setFields(langInfo) {
-        const list = convert_utils_1.convertLangInfoToList(langInfo);
+        const list = (0, convert_utils_1.convertLangInfoToList)(langInfo);
         list.forEach(item => {
             this.setField(item.name, item.value);
         });
@@ -94,7 +94,7 @@ class LangInfoModel {
         delete this._plainMap[fieldNamePath];
     }
     toLangObj() {
-        return convert_utils_1.convertPlainLangInfoToLangInfo(this._plainMap);
+        return (0, convert_utils_1.convertPlainLangInfoToLangInfo)(this._plainMap);
     }
 }
 exports.default = LangInfoModel;

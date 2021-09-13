@@ -59,9 +59,9 @@ commander_1.default
     //   return path.resolve(process.cwd(), item)
     // })
     const _filePathList = options.filePathList.map(utils_1.normalizeProcessArg);
-    const _customTemplatePath = utils_1.normalizeProcessArg(options.customTemplatePath);
-    const filePathList = utils_1.getExistFileListByFileListPath(_filePathList);
-    const output = path_1.default.resolve(process.cwd(), utils_1.normalizeProcessArg(options.output));
+    const _customTemplatePath = (0, utils_1.normalizeProcessArg)(options.customTemplatePath);
+    const filePathList = (0, utils_1.getExistFileListByFileListPath)(_filePathList);
+    const output = path_1.default.resolve(process.cwd(), (0, utils_1.normalizeProcessArg)(options.output));
     if (filePathList.length === 0) {
         console.log(chalk_1.default.red('excel 文件不存在！'), _filePathList);
         return;
@@ -102,7 +102,7 @@ commander_1.default
     }
     getConfirmPromise('确认转化吗?').then((isConfirm) => {
         if (isConfirm) {
-            excel2lang_1.convertExcelToFile(filePathList, {
+            (0, excel2lang_1.convertExcelToFile)(filePathList, {
                 sheetIdx,
                 fileType,
                 template: templateExcel,

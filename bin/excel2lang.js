@@ -15,15 +15,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertExcelToFile = exports.convertSheetToTsFiles = exports.convertSheetToJsonModuleFiles = exports.convertSheetToJsonFiles = exports.updateLangsInfoModelFromSheetData = exports.readSheetDataFromExcel = void 0;
-const node_xlsx_1 = __importDefault(require("node-xlsx"));
-const utils_1 = require("./utils");
-const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const LangsInfoModel_1 = __importDefault(require("./LangsInfoModel"));
-const typescript_1 = __importDefault(require("./template/typescript"));
-const json_1 = __importDefault(require("./template/json"));
-const xml_1 = __importDefault(require("./template/xml"));
+const node_xlsx_1 = __importDefault(require("node-xlsx"));
+const path_1 = __importDefault(require("path"));
 const convert_utils_1 = require("./convert-utils");
+const LangsInfoModel_1 = __importDefault(require("./LangsInfoModel"));
+const json_1 = __importDefault(require("./template/json"));
+const typescript_1 = __importDefault(require("./template/typescript"));
+const xml_1 = __importDefault(require("./template/xml"));
+const utils_1 = require("./utils");
 const doT = require('dot');
 doT.templateSettings.strip = false;
 // import fs from 'fs'
@@ -193,7 +193,7 @@ function _convertSheetToModuleFiles(langsInfoModel, moduleContentConvertor, opti
                 moduleJsonString: JSON.stringify(moduleObj, null, 2),
                 destDirPath: pathStr
             });
-            utils_1.tryToSaveFileSync(filePath, strContent);
+            (0, utils_1.tryToSaveFileSync)(filePath, strContent);
         }
     });
 }
@@ -225,7 +225,7 @@ function _convertSheetToFiles(langsInfoModel, contentTemplate, templateExt, opti
             moduleObj: moduleObj
         });
         if (filePath) {
-            utils_1.tryToSaveFileSync(filePath, strContent);
+            (0, utils_1.tryToSaveFileSync)(filePath, strContent);
         }
     });
 }

@@ -1,5 +1,5 @@
 import LangsInfoModel from './LangsInfoModel';
-export declare function readSheetDataFromExcel(filePath: string, sheetIdx: number): [][];
+export declare function readSheetDataFromExcel(filePath: string, sheetIdx: number): unknown[][];
 export interface IConvertLangOption {
     /**
      * 定位ID列和语言行的位置

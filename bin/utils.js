@@ -84,7 +84,7 @@ function tryToSaveFileSync(filePath, data, options) {
 exports.tryToSaveFileSync = tryToSaveFileSync;
 function globFilesPath(globPath) {
     return new Promise((resolve, reject) => {
-        glob_1.default(globPath, {}, function (err, files) {
+        (0, glob_1.default)(globPath, {}, function (err, files) {
             if (err) {
                 reject(err);
                 return;
