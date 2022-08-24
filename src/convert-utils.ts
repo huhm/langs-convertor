@@ -7,10 +7,10 @@ import {
 import { convertNamePath, isImage } from './utils'
 
 
-export const DEFAULT_ID_TAG='[[ID]]'
-export interface IConvertedLangItem{ 
-   name: string;
-   value: ILangObjValueTypeBase
+export const DEFAULT_ID_TAG = '[[ID]]'
+export interface IConvertedLangItem {
+  name: string;
+  value: ILangObjValueTypeBase
 }
 
 /**
@@ -71,6 +71,22 @@ export function convertLangInfoToList(langObj: ILangObj) {
   return langItemList
 }
 
+/**
+ *
+ * @param langObj 待翻译的语言文件对象
+ * @returns {key:string,value:string}[]
+ */
+export function convertMultiLangsToList(
+  langMap: { [langName: string]: ILangObj }) {
+
+  const langMap2: {
+    [langName: string]: IConvertedLangItem[]
+  } = {}
+  for (let langName in langMap) {
+    langMap2[langName] = convertLangInfoToList(langMap[langName])
+  }
+  return langMap2
+}
 export function convertPlainLangInfoToLangInfo(
   plainLangInfoMap: IPlainLangInfo,
   _langResult?: ILangObj

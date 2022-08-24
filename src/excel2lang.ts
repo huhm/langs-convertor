@@ -245,7 +245,7 @@ function _convertSheetToModuleFiles(
     })
   }
   if (!fs.existsSync(pathStr)) {
-    fs.mkdirSync(pathStr)
+    fs.mkdirSync(pathStr, { recursive: true })
   }
   langsInfoModel.forEachModule(({ moduleObj, moduleName, langName, langModel }) => {
     const filePath = getFileName({
@@ -296,7 +296,7 @@ function _convertSheetToFiles(langsInfoModel: LangsInfoModel,
   const getFileName =
     _getFileName || createGetFilePathFunc(templateExt)
   if (!fs.existsSync(pathStr)) {
-    fs.mkdirSync(pathStr)
+    fs.mkdirSync(pathStr, { recursive: true })
   }
   langsInfoModel.forEachLang((model, langName) => {
     const filePath = getFileName({

@@ -1,6 +1,6 @@
-import fs,{WriteFileOptions} from 'fs'
-import path from 'path'
+import fs, { WriteFileOptions } from 'fs'
 import glob from 'glob'
+import path from 'path'
 // /**
 //  * 移除字符串前后的空格和\r
 //  * @param str
@@ -32,6 +32,8 @@ import glob from 'glob'
 /**
  * 转换异常，返回null
  * @param namePath
+ * 支持 a.b  对象
+ *   a[\d] 数组
  */
 export function convertNamePath(namePath: string) {
   const result: (string | number)[] = []
@@ -53,11 +55,11 @@ export function convertNamePath(namePath: string) {
   return result
 }
 
-export function isImage(str: string|number) {
+export function isImage(str: string | number) {
   if (!str) {
     return false
   }
-  if(typeof str !=='string'){
+  if (typeof str !== 'string') {
     return false;
   }
   if (str.startsWith('data:image/png;')) {
@@ -68,20 +70,20 @@ export function isImage(str: string|number) {
   }
   return false
 }
- 
 
-export function tryToSaveFileSync(filePath:string, data: string | NodeJS.ArrayBufferView, options?: WriteFileOptions){
+
+export function tryToSaveFileSync(filePath: string, data: string | NodeJS.ArrayBufferView, options?: WriteFileOptions) {
   const fileDirPath = path.dirname(filePath)
-  if(!fs.existsSync(fileDirPath)){
-    fs.mkdirSync(fileDirPath)
+  if (!fs.existsSync(fileDirPath)) {
+    fs.mkdirSync(fileDirPath, { recursive: true })
   }
-  fs.writeFileSync(filePath, data,options)
+  fs.writeFileSync(filePath, data, options)
 }
 
-export function globFilesPath(globPath:string){
-  return new Promise<string[]>((resolve,reject)=>{
-    glob(globPath,{},function(err,files){
-      if(err){
+export function globFilesPath(globPath: string) {
+  return new Promise<string[]>((resolve, reject) => {
+    glob(globPath, {}, function (err, files) {
+      if (err) {
         reject(err)
         return
       }
@@ -91,10 +93,10 @@ export function globFilesPath(globPath:string){
 }
 
 export function getExistFileListByFileListPath(fileListPath: string[]) {
-  let fileList = [] as string[] 
+  let fileList = [] as string[]
   fileListPath.forEach((item) => {
-    let fList = globFilesPathSync(item) 
-    fileList=fileList.concat(fList)
+    let fList = globFilesPathSync(item)
+    fileList = fileList.concat(fList)
     // fList.forEach((filePath) => {
     //   if (fs.existsSync(filePath)) {
     //   }
@@ -102,28 +104,28 @@ export function getExistFileListByFileListPath(fileListPath: string[]) {
   })
   return fileList
 }
-export function globFilesPathSync(globPath:string){
-  return glob.sync(globPath,{
-    sync:true
+export function globFilesPathSync(globPath: string) {
+  return glob.sync(globPath, {
+    sync: true
   })
 }
 
-export function globFilesContentSync(globPath:string){
-  const fileContentMap={} as {[filePath:string]:string}
-  const filePathList=globFilesPathSync(globPath)
-  filePathList.forEach(item=>{
-    fileContentMap[item]=fs.readFileSync(item,'utf-8')
+export function globFilesContentSync(globPath: string) {
+  const fileContentMap = {} as { [filePath: string]: string }
+  const filePathList = globFilesPathSync(globPath)
+  filePathList.forEach(item => {
+    fileContentMap[item] = fs.readFileSync(item, 'utf-8')
   })
   return fileContentMap
 }
 
-export function normalizeProcessArg(strArg:string){
-  if(!strArg){
+export function normalizeProcessArg(strArg: string) {
+  if (!strArg) {
     return strArg
   }
-  let result=strArg.trim();
-  if(result[0]==='\''|| result[0]==='"'){
-    result=result.slice(1,-1)
+  let result = strArg.trim();
+  if (result[0] === '\'' || result[0] === '"') {
+    result = result.slice(1, -1)
   }
   return result
 }

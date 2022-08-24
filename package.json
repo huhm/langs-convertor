@@ -9,7 +9,8 @@
     "debug": "ts-node src/lang-cvt.ts -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --templateExcel ./dist/template.xlsx --fileType ts --missingMode placeholder"
   },
   "bin": {
-    "lang-cvt": "bin/lang-cvt.js"
+    "lang-cvt": "bin/lang-cvt.js",
+    "langs-convertor": "bin/lang-cvt.js"
   },
   "author": "huhm2008@foxmail.com",
   "keywords": [

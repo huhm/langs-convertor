@@ -62,20 +62,18 @@ export type IMultiLangExcelOption = Omit<
   ILangExcelOption,
   'langNameListToTranslate' | 'customHeaders'
 >
-/**
- * 语言列表生成excel
- * @param list
- * @param options
- */
-export function convertMultiLangsLangItemsMapToExcel(
-  langMap: {
-    [langName: string]: IConvertedLangItem[]
-  },
-  options?: IMultiLangExcelOption
-) {
+
+type ISheetData = {
+  name: string,
+  data: string[][],
+}
+
+export function createSheetDataByMultiLangMap(langMap: {
+  [langName: string]: IConvertedLangItem[]
+},
+  options?: Pick<IMultiLangExcelOption, 'sheetName'>) {
   const {
     sheetName,
-    output,
     // namespace
   } = options || {}
   const idRowIdx = 0
@@ -98,14 +96,35 @@ export function convertMultiLangsLangItemsMapToExcel(
     })
     langIdx++
   }
-  const xlsxFile = xlsx.build([
-    {
-      name: sheetName || 'default',
-      data: xlsxData,
-    },
-  ])
+
+  return {
+    name: sheetName || 'default',
+    data: xlsxData,
+  } as ISheetData
+}
+
+export function buildExcel(sheetList: ISheetData[], output?: string) {
+  const xlsxFile = xlsx.build(sheetList)
   let filePath = path.resolve(process.cwd(), output || './lang-base.xlsx')
   tryToSaveFileSync(filePath, new Uint8Array(xlsxFile))
+}
+
+/**
+ * 语言列表生成excel
+ * @param list
+ * @param options
+ */
+export function convertMultiLangsLangItemsMapToExcel(
+  langMap: {
+    [langName: string]: IConvertedLangItem[]
+  },
+  options?: IMultiLangExcelOption
+) {
+  const {
+    output,
+  } = options || {}
+  const sheetData = createSheetDataByMultiLangMap(langMap, options);
+  buildExcel([sheetData], output)
 }
 
 export function convertToExcel(langObj: ILangObj, options?: ILangExcelOption) {
@@ -113,7 +132,6 @@ export function convertToExcel(langObj: ILangObj, options?: ILangExcelOption) {
   convertLangItemsToExcel(list, options)
   return list
 }
-
 /**
  * 多语言列表生成excel
  * @param langMap
