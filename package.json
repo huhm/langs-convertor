@@ -5,6 +5,7 @@
   "main": "bin/index.js",
   "types": "bin/index.d.ts",
   "scripts": {
+    "dev": "tsc --watch",
     "build": "tsc",
     "publish:patch": "npm run build && npm version patch && npm publish",
     "debug": "ts-node src/lang-cvt.ts -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --templateExcel ./dist/template.xlsx --fileType ts --missingMode placeholder"
