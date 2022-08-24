@@ -1,6 +1,6 @@
 # langs-tool
 
-[![npm version](https://badge.fury.io/js/langs-convertor.svg)](https://badge.fury.io/js/langs-convertor)
+[![npm version](https://badge.fury.io/js/langs-tool.svg)](https://badge.fury.io/js/langs-tool)
 
 ## Features
 
@@ -16,21 +16,21 @@
 
 ## 命令行方式
 
-1. 安装 `npm i langs-convertor`
+1. 安装 `npm i langs-tool`
 2. 使用
 
 ```bash
 # 查看帮助文档
-npx langs-convertor -h
+npx langs-tool -h
 
 # 转化xlsx 为json文件
-npx langs-convertor -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist  --fileType xml
+npx langs-tool -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist  --fileType xml
 
 # 转xlsx 为xml文件 fileType=xml
-npx langs-convertor -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --fileType xml
+npx langs-tool -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --fileType xml
 
 # 转xlsx 为ts文件 fileType=ts
-npx langs-convertor -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --templateExcel ./dist/template.xlsx --fileType ts --missingMode placeholder
+npx langs-tool -f ./dist/lang-base-*.xlsx ./dist/lang-v2-*.xlsx --output ./dist --templateExcel ./dist/template.xlsx --fileType ts --missingMode placeholder
 ```
 
 ## excel 格式说明
