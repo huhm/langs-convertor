@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertSubstractLangsToExcels = exports.createLangModuleMapByFileGlob = exports.convertMultiLangsToExcel = exports.convertToExcel = exports.convertMultiLangsLangItemsMapToExcel = exports.convertLangItemsToExcel = void 0;
+exports.convertSubstractLangsToExcels = exports.createLangModuleMapByFileGlob = exports.convertMultiLangsToExcel = exports.convertToExcel = exports.convertMultiLangsLangItemsMapToExcel = exports.buildExcel = exports.createSheetDataByMultiLangMap = exports.convertLangItemsToExcel = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const path_1 = __importDefault(require("path"));
 const convert_utils_1 = require("./convert-utils");
@@ -40,13 +40,8 @@ function convertLangItemsToExcel(list, options) {
     (0, utils_1.tryToSaveFileSync)(filePath, new Uint8Array(xlsxFile));
 }
 exports.convertLangItemsToExcel = convertLangItemsToExcel;
-/**
- * 语言列表生成excel
- * @param list
- * @param options
- */
-function convertMultiLangsLangItemsMapToExcel(langMap, options) {
-    const { sheetName, output,
+function createSheetDataByMultiLangMap(langMap, options) {
+    const { sheetName,
     // namespace
      } = options || {};
     const idRowIdx = 0;
@@ -67,14 +62,27 @@ function convertMultiLangsLangItemsMapToExcel(langMap, options) {
         });
         langIdx++;
     }
-    const xlsxFile = node_xlsx_1.default.build([
-        {
-            name: sheetName || 'default',
-            data: xlsxData,
-        },
-    ]);
+    return {
+        name: sheetName || 'default',
+        data: xlsxData,
+    };
+}
+exports.createSheetDataByMultiLangMap = createSheetDataByMultiLangMap;
+function buildExcel(sheetList, output) {
+    const xlsxFile = node_xlsx_1.default.build(sheetList);
     let filePath = path_1.default.resolve(process.cwd(), output || './lang-base.xlsx');
     (0, utils_1.tryToSaveFileSync)(filePath, new Uint8Array(xlsxFile));
+}
+exports.buildExcel = buildExcel;
+/**
+ * 语言列表生成excel
+ * @param list
+ * @param options
+ */
+function convertMultiLangsLangItemsMapToExcel(langMap, options) {
+    const { output, } = options || {};
+    const sheetData = createSheetDataByMultiLangMap(langMap, options);
+    buildExcel([sheetData], output);
 }
 exports.convertMultiLangsLangItemsMapToExcel = convertMultiLangsLangItemsMapToExcel;
 function convertToExcel(langObj, options) {

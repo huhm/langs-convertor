@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeProcessArg = exports.globFilesContentSync = exports.globFilesPathSync = exports.getExistFileListByFileListPath = exports.globFilesPath = exports.tryToSaveFileSync = exports.isImage = exports.convertNamePath = void 0;
 const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const glob_1 = __importDefault(require("glob"));
+const path_1 = __importDefault(require("path"));
 // /**
 //  * 移除字符串前后的空格和\r
 //  * @param str
@@ -36,6 +36,8 @@ const glob_1 = __importDefault(require("glob"));
 /**
  * 转换异常，返回null
  * @param namePath
+ * 支持 a.b  对象
+ *   a[\d] 数组
  */
 function convertNamePath(namePath) {
     const result = [];
@@ -77,7 +79,7 @@ exports.isImage = isImage;
 function tryToSaveFileSync(filePath, data, options) {
     const fileDirPath = path_1.default.dirname(filePath);
     if (!fs_1.default.existsSync(fileDirPath)) {
-        fs_1.default.mkdirSync(fileDirPath);
+        fs_1.default.mkdirSync(fileDirPath, { recursive: true });
     }
     fs_1.default.writeFileSync(filePath, data, options);
 }

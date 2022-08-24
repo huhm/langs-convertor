@@ -176,7 +176,7 @@ function _convertSheetToModuleFiles(langsInfoModel, moduleContentConvertor, opti
         });
     }
     if (!fs_1.default.existsSync(pathStr)) {
-        fs_1.default.mkdirSync(pathStr);
+        fs_1.default.mkdirSync(pathStr, { recursive: true });
     }
     langsInfoModel.forEachModule(({ moduleObj, moduleName, langName, langModel }) => {
         const filePath = getFileName({
@@ -209,7 +209,7 @@ function _convertSheetToFiles(langsInfoModel, contentTemplate, templateExt, opti
     const pathStr = path_1.default.normalize(output || path_1.default.resolve(process.cwd(), './dist-lang'));
     const getFileName = _getFileName || createGetFilePathFunc(templateExt);
     if (!fs_1.default.existsSync(pathStr)) {
-        fs_1.default.mkdirSync(pathStr);
+        fs_1.default.mkdirSync(pathStr, { recursive: true });
     }
     langsInfoModel.forEachLang((model, langName) => {
         const filePath = getFileName({

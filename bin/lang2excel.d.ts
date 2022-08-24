@@ -20,6 +20,14 @@ export interface ILangExcelOption {
  */
 export declare function convertLangItemsToExcel(list: IConvertedLangItem[], options?: ILangExcelOption): void;
 export declare type IMultiLangExcelOption = Omit<ILangExcelOption, 'langNameListToTranslate' | 'customHeaders'>;
+declare type ISheetData = {
+    name: string;
+    data: string[][];
+};
+export declare function createSheetDataByMultiLangMap(langMap: {
+    [langName: string]: IConvertedLangItem[];
+}, options?: Pick<IMultiLangExcelOption, 'sheetName'>): ISheetData;
+export declare function buildExcel(sheetList: ISheetData[], output?: string): void;
 /**
  * 语言列表生成excel
  * @param list
@@ -78,3 +86,4 @@ export declare function convertSubstractLangsToExcels(langMap: {
      */
     placeholderPrefix?: string;
 }): void;
+export {};
