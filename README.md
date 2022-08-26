@@ -237,4 +237,14 @@ const fileContentMap = createLangModuleMapByFileGlob('./local/**/*.json', {
 convertMultiLangsToExcel(fileContentMap, {
   output: './lang-base.xlsx',
 })
+
+```
+### 现有语言包转中间产物
+``` ts
+import {convertLangInfoToList} from 'langs-tool'
+// langObj为{moduleName:{xxx:'xxx'}} 结构，将被打平
+const list =convertLangInfoToList(langObj)
+list.forEach(item=>{
+  console.log(item.name,item.value)
+})
 ```
