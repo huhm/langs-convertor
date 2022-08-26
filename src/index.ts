@@ -4,6 +4,7 @@ import {
   readSheetDataFromExcel,
   convertExcelToFile,
   readSheetsFromExcel,
+  convertExcelToLangsInfoModel,
 } from './excel2lang'
 
 export { globFilesPathSync, globFilesPath, globFilesContentSync } from './utils'
@@ -16,6 +17,7 @@ export {
   readSheetDataFromExcel,
   convertExcelToFile,
   readSheetsFromExcel,
+  convertExcelToLangsInfoModel,
 }
 
 export * from './lang2excel'
