@@ -243,8 +243,8 @@ convertMultiLangsToExcel(fileContentMap, {
 ``` ts
 import {convertLangInfoToList} from 'langs-tool'
 // langObj为{moduleName:{xxx:'xxx'}} 结构，将被打平
-const list =convertLangInfoToList(langObj)
-list.forEach(item=>{
+const fieldList =convertLangInfoToList(langObj)
+fieldList.forEach(item=>{
   console.log(item.name,item.value)
 })
 ```
