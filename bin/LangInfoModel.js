@@ -45,6 +45,9 @@ class LangInfoModel {
     get fieldsList() {
         return this._fieldsList;
     }
+    get langName() {
+        return this._langName;
+    }
     findLangItemInList(fieldNamePath) {
         let idx = this.indexOfLangItem(fieldNamePath);
         if (idx != null) {
@@ -61,7 +64,7 @@ class LangInfoModel {
     }
     setFields(langInfo) {
         const list = (0, convert_utils_1.convertLangInfoToList)(langInfo);
-        list.forEach(item => {
+        list.forEach((item) => {
             this.setField(item.name, item.value);
         });
     }
@@ -93,8 +96,19 @@ class LangInfoModel {
         }
         delete this._plainMap[fieldNamePath];
     }
+    /**
+     * 获取嵌套结构的多语言
+     * @returns
+     */
     toLangObj() {
         return (0, convert_utils_1.convertPlainLangInfoToLangInfo)(this._plainMap);
+    }
+    /**
+     * 获取打平的key-value的json字符串
+     * @returns
+     */
+    getPlainMapJsonString(space) {
+        return JSON.stringify(this._plainMap, null, space);
     }
 }
 exports.default = LangInfoModel;

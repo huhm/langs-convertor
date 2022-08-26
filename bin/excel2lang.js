@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertExcelToFile = exports.convertSheetToTsFiles = exports.convertSheetToJsonModuleFiles = exports.convertSheetToJsonFiles = exports.updateLangsInfoModelFromSheetData = exports.readSheetDataFromExcel = void 0;
+exports.convertExcelToFile = exports.convertExcelToLangsInfoModel = exports.convertSheetToTsFiles = exports.convertSheetToJsonModuleFiles = exports.convertSheetToJsonFiles = exports.updateLangsInfoModelFromSheetData = exports.readSheetsFromExcel = exports.readSheetDataFromExcel = void 0;
 const fs_1 = __importDefault(require("fs"));
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const path_1 = __importDefault(require("path"));
@@ -32,6 +32,11 @@ function readSheetDataFromExcel(filePath, sheetIdx) {
     return workSheets[sheetIdx].data;
 }
 exports.readSheetDataFromExcel = readSheetDataFromExcel;
+function readSheetsFromExcel(filePath) {
+    const workSheets = node_xlsx_1.default.parse(filePath);
+    return workSheets;
+}
+exports.readSheetsFromExcel = readSheetsFromExcel;
 //#region convertPlainLangsInfoFromSheetData
 const TAG_IGNORE = '{IGNORE}';
 const TAG_CONTINUE = '{CONTINUE}';
@@ -191,7 +196,7 @@ function _convertSheetToModuleFiles(langsInfoModel, moduleContentConvertor, opti
                 moduleName,
                 moduleObj,
                 moduleJsonString: JSON.stringify(moduleObj, null, 2),
-                destDirPath: pathStr
+                destDirPath: pathStr,
             });
             (0, utils_1.tryToSaveFileSync)(filePath, strContent);
         }
@@ -222,7 +227,7 @@ function _convertSheetToFiles(langsInfoModel, contentTemplate, templateExt, opti
             destDirPath: pathStr,
             moduleJsonString: JSON.stringify(moduleObj, null, 2),
             fieldsList: model.fieldsList,
-            moduleObj: moduleObj
+            moduleObj: moduleObj,
         });
         if (filePath) {
             (0, utils_1.tryToSaveFileSync)(filePath, strContent);
@@ -235,7 +240,7 @@ function convertSheetToJsonFiles(langsInfoModel, options) {
 exports.convertSheetToJsonFiles = convertSheetToJsonFiles;
 function createGetFilePathFunc(extStr) {
     return function (info) {
-        const { langName, moduleName, destDirPath, } = info;
+        const { langName, moduleName, destDirPath } = info;
         const filePath = path_1.default.resolve(destDirPath, `./${moduleName || ''}`, langName + (extStr || '.json'));
         return filePath;
     };
@@ -255,7 +260,7 @@ exports.convertSheetToTsFiles = convertSheetToTsFiles;
 //#region 模板文件
 /**
  * 模板文件
- * @param template
+ * @param template 模板文件路径
  * @param sheetIdx
  * @param options
  */
@@ -273,26 +278,34 @@ function readTemplateFieldsSet(template, sheetIdx, options) {
         return templateFieldsSet;
     }
 }
-//#endregion
-function convertExcelToFile(filePathList, options) {
-    const _a = options || {}, { template, sheetIdx, fileType, customTemplatePath } = _a, restOptions = __rest(_a, ["template", "sheetIdx", "fileType", "customTemplatePath"]);
-    const templateFieldsSet = readTemplateFieldsSet(template, sheetIdx || 0, restOptions);
+function convertExcelToLangsInfoModel(filePathList, options) {
+    const _a = options || {}, { template, sheetIdx = 0 } = _a, restOptions = __rest(_a, ["template", "sheetIdx"]);
+    const sheetIdxList = typeof sheetIdx === 'number' ? [sheetIdx] : sheetIdx;
+    const templateFieldsSet = readTemplateFieldsSet(template, sheetIdxList[0], restOptions);
     const sheetResult = new LangsInfoModel_1.default();
     filePathList.forEach((filePath) => {
-        const sheetData = readSheetDataFromExcel(filePath, sheetIdx || 0);
-        // 2.将表格数据转换为多语言包
-        updateLangsInfoModelFromSheetData(sheetData, sheetResult, restOptions);
+        sheetIdxList.forEach((sIdx) => {
+            const sheetData = readSheetDataFromExcel(filePath, sIdx);
+            // 2.将表格数据转换为多语言包
+            updateLangsInfoModelFromSheetData(sheetData, sheetResult, restOptions);
+        });
     });
     if (templateFieldsSet) {
         // 按templateFieldsMap改造sheetResult
         sheetResult.normalizeByTemplate(templateFieldsSet, restOptions);
     }
+    return sheetResult;
+}
+exports.convertExcelToLangsInfoModel = convertExcelToLangsInfoModel;
+function convertExcelToFile(filePathList, options) {
+    const _a = options || {}, { fileType, customTemplatePath } = _a, restOptions = __rest(_a, ["fileType", "customTemplatePath"]);
+    const sheetResult = convertExcelToLangsInfoModel(filePathList, options);
     // 3. 转成文件
     switch (fileType) {
         case 'ts':
             convertSheetToTsFiles(sheetResult, restOptions);
             break;
-        case 'json-module':
+        case 'json-module': // 按module拆分文件
             convertSheetToJsonModuleFiles(sheetResult, restOptions);
             break;
         case 'custom':
@@ -312,7 +325,7 @@ function convertExcelToFile(filePathList, options) {
         case 'xml':
             _convertSheetToFiles(sheetResult, xml_1.default, '.xml', options);
             break;
-        case 'json':
+        case 'json': // 所有module在一个文件
         default:
             convertSheetToJsonFiles(sheetResult, restOptions);
             break;

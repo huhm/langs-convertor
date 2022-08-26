@@ -370,7 +370,7 @@ export function convertSheetToTsFiles(
 
 /**
  * 模板文件
- * @param template
+ * @param template 模板文件路径
  * @param sheetIdx
  * @param options
  */
@@ -399,13 +399,53 @@ function readTemplateFieldsSet(
 
 //#endregion
 
+type IConvertExcelToLangsInfoModelOptions = {
+  /**
+   * 表格位置，默认第0个
+   */
+  sheetIdx?: number | number[]
+
+  /**
+   * 模板字段  文件路径（只有模板字段中的字段才会被翻译）
+   */
+  template?: string
+} & IConvertLangOption &
+  IConvertFileOption
+export function convertExcelToLangsInfoModel(
+  filePathList: string[],
+  options?: IConvertExcelToLangsInfoModelOptions
+) {
+  const { template, sheetIdx = 0, ...restOptions } = options || {}
+
+  const sheetIdxList = typeof sheetIdx === 'number' ? [sheetIdx] : sheetIdx
+  const templateFieldsSet = readTemplateFieldsSet(
+    template,
+    sheetIdxList[0],
+    restOptions
+  )
+
+  const sheetResult = new LangsInfoModel()
+  filePathList.forEach((filePath) => {
+    sheetIdxList.forEach((sIdx) => {
+      const sheetData = readSheetDataFromExcel(filePath, sIdx)
+      // 2.将表格数据转换为多语言包
+      updateLangsInfoModelFromSheetData(
+        sheetData as string[][],
+        sheetResult,
+        restOptions
+      )
+    })
+  })
+  if (templateFieldsSet) {
+    // 按templateFieldsMap改造sheetResult
+    sheetResult.normalizeByTemplate(templateFieldsSet, restOptions)
+  }
+  return sheetResult
+}
+
 export function convertExcelToFile(
   filePathList: string[],
-  options?: {
-    /**
-     * 表格位置，默认第0个
-     */
-    sheetIdx?: number
+  options?: IConvertExcelToLangsInfoModelOptions & {
     /**
      * json： 每个语言一个文件
      * xml: 已有模板 ，每个语言一个文件
@@ -426,41 +466,16 @@ export function convertExcelToFile(
      * }
      */
     customTemplatePath?: string
-    /**
-     * 模板字段（只有模板字段中的字段才会被翻译）
-     */
-    template?: string
-  } & IConvertLangOption &
-    IConvertFileOption
-) {
-  const { template, sheetIdx, fileType, customTemplatePath, ...restOptions } =
-    options || {}
-  const templateFieldsSet = readTemplateFieldsSet(
-    template,
-    sheetIdx || 0,
-    restOptions
-  )
-
-  const sheetResult = new LangsInfoModel()
-  filePathList.forEach((filePath) => {
-    const sheetData = readSheetDataFromExcel(filePath, sheetIdx || 0)
-    // 2.将表格数据转换为多语言包
-    updateLangsInfoModelFromSheetData(
-      sheetData as string[][],
-      sheetResult,
-      restOptions
-    )
-  })
-  if (templateFieldsSet) {
-    // 按templateFieldsMap改造sheetResult
-    sheetResult.normalizeByTemplate(templateFieldsSet, restOptions)
   }
+) {
+  const { fileType, customTemplatePath, ...restOptions } = options || {}
+  const sheetResult = convertExcelToLangsInfoModel(filePathList, options)
   // 3. 转成文件
   switch (fileType) {
     case 'ts':
       convertSheetToTsFiles(sheetResult, restOptions)
       break
-    case 'json-module':
+    case 'json-module': // 按module拆分文件
       convertSheetToJsonModuleFiles(sheetResult, restOptions)
       break
     case 'custom':
@@ -489,7 +504,7 @@ export function convertExcelToFile(
     case 'xml':
       _convertSheetToFiles(sheetResult, XML_TEMPLATE, '.xml', options)
       break
-    case 'json':
+    case 'json': // 所有module在一个文件
     default:
       convertSheetToJsonFiles(sheetResult, restOptions)
       break

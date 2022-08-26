@@ -111,8 +111,7 @@ Feedback.questions[1].content
 
 ```js
 const path = require('path')
-const { convertExcelToFile } = require('langs-tool')
-
+const { convertExcelToFile,convertExcelToLangsInfoModel } = require('langs-tool') 
 convertExcelToFile(
   ['./excel/v1-complete.xlsx', './excel/v2-id.xlsx', './excel/v2-hi.xlsx'],
   {
@@ -125,6 +124,22 @@ convertExcelToFile(
     missingValue: '[TODO:LACKFIELD]',
   }
 )
+
+// excel转语言包
+const langsModel =convertExcelToLangsInfoModel(['./excel/v1-complete.xlsx', './excel/v2-id.xlsx', './excel/v2-hi.xlsx'],{
+    sheetIdx:[0,1,2],// 支持数组，默认为0
+    template: './excel/template.xlsx', 
+});
+// 获取某个语言的对象
+const langInfoModel = langsModel.getLangInfoModel('en')
+langInfoModel.fieldList.forEach((item)=>{
+  console.log(item.name,item.value)// 遍历所有字段
+})
+// 获取打平的json字符串
+console.log(langInfoModel.getPlainMapJsonString(2));
+
+// 获取嵌套的多语言对象
+console.log(langInfoModel.toLangObj())
 ```
 
 模板定义 tpl.txt
@@ -238,6 +253,8 @@ convertMultiLangsToExcel(fileContentMap, {
   output: './lang-base.xlsx',
 })
 
+
+
 ```
 ### 现有语言包转中间产物
 ``` ts
@@ -247,4 +264,6 @@ const fieldList =convertLangInfoToList(langObj)
 fieldList.forEach(item=>{
   console.log(item.name,item.value)
 })
+
+
 ```

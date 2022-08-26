@@ -23,6 +23,7 @@ export default class LangInfoModel {
     private _plainMap;
     private _fieldsList;
     get fieldsList(): LangInfoItemModel[];
+    get langName(): string;
     constructor(langName: string);
     private findLangItemInList;
     private indexOfLangItem;
@@ -31,5 +32,14 @@ export default class LangInfoModel {
     getFieldValue(fieldNamePath: string): string;
     isExist(fieldNamePath: string): boolean;
     deleteField(fieldNamePath: string): void;
+    /**
+     * 获取嵌套结构的多语言
+     * @returns
+     */
     toLangObj(): ILangObj;
+    /**
+     * 获取打平的key-value的json字符串
+     * @returns
+     */
+    getPlainMapJsonString(space?: string | number | undefined): string;
 }

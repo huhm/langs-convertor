@@ -1,5 +1,9 @@
 import LangsInfoModel from './LangsInfoModel';
 export declare function readSheetDataFromExcel(filePath: string, sheetIdx: number): unknown[][];
+export declare function readSheetsFromExcel(filePath: string): {
+    name: string;
+    data: unknown[][];
+}[];
 export interface IConvertLangOption {
     /**
      * 定位ID列和语言行的位置
@@ -43,11 +47,18 @@ export interface IConvertFileOption {
 export declare function convertSheetToJsonFiles(langsInfoModel: LangsInfoModel, options?: IConvertFileOption): void;
 export declare function convertSheetToJsonModuleFiles(langsInfoModel: LangsInfoModel, options?: IConvertFileOption): void;
 export declare function convertSheetToTsFiles(langsInfoModel: LangsInfoModel, options?: IConvertFileOption): void;
-export declare function convertExcelToFile(filePathList: string[], options?: {
+declare type IConvertExcelToLangsInfoModelOptions = {
     /**
      * 表格位置，默认第0个
      */
-    sheetIdx?: number;
+    sheetIdx?: number | number[];
+    /**
+     * 模板字段  文件路径（只有模板字段中的字段才会被翻译）
+     */
+    template?: string;
+} & IConvertLangOption & IConvertFileOption;
+export declare function convertExcelToLangsInfoModel(filePathList: string[], options?: IConvertExcelToLangsInfoModelOptions): LangsInfoModel;
+export declare function convertExcelToFile(filePathList: string[], options?: IConvertExcelToLangsInfoModelOptions & {
     /**
      * json： 每个语言一个文件
      * xml: 已有模板 ，每个语言一个文件
@@ -68,8 +79,5 @@ export declare function convertExcelToFile(filePathList: string[], options?: {
      * }
      */
     customTemplatePath?: string;
-    /**
-     * 模板字段（只有模板字段中的字段才会被翻译）
-     */
-    template?: string;
-} & IConvertLangOption & IConvertFileOption): void;
+}): void;
+export {};
