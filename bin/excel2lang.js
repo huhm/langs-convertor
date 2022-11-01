@@ -109,7 +109,9 @@ function updateLangsInfoModelFromSheetData(sheetData, sheetResult, options) {
         langSummaryInfoList.forEach((summaryItem) => {
             const langStrVal = row[summaryItem.col];
             // 解析val
-            const langStrValList = (langStrVal || '').replace(/\r/g, '').split('\n');
+            const langStrValList = typeof langStrVal === 'number'
+                ? [langStrVal + '']
+                : (langStrVal || '').replace(/\r/g, '').split('\n');
             idList.forEach((idSearchInfo) => {
                 let curVal = langStrVal;
                 if (!(idSearchInfo.toIdx === -1 && idSearchInfo.fromIdx === 0)) {
